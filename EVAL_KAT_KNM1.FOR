@@ -385,8 +385,8 @@ C END OF SPLINES CALCULATION _____________________________
 	end
 
       SUBROUTINE 	expmlspectrum(E,Specml,E0,ac)
-c experimental value of missing level spectrum
-c      subroutine expspectrum(e,espec,e0,snm,ac,ntyp)
+c experimental value of missing level spectrum 
+c     subroutine expspectrum(e,espec,e0,snm,ac,ntyp)
       implicit double precision (a-h,o-z)
       dimension w(2000),iw(260)
       external convol_ml

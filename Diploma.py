@@ -1,4 +1,3 @@
-from tkinter import E
 import numpy as np
 import csv
 
@@ -73,7 +72,7 @@ def chi2(npar, grad, fval, xval, iflag):
         with open('run_kat_MC2.dat', 'w') as f:
             print("Simulation with Elow=", Emin, file=f)
             print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"))
-            for i in range(1, npoint+1):
+            for i in range(npoint):
                 e = epoint[i]
                 specint(e, espec[i], e0, snm, espnm[i], thick)
                 specint(e, hnu[i], e0, snm2, espnm2[i], thick)
@@ -89,10 +88,10 @@ def chi2(npar, grad, fval, xval, iflag):
 
     if iflag == 5:
         Num_MC += 1
-        for i in range(1, npoint+1):
+        for i in range(npoint):
             Edata[i] = fakesp[i] + error[i]*np.random.normal()
             rancor[i] = (Edata[i] - fakesp[i])/error[i]
-        for i in range(1, npoint+1):
+        for i in range(npoint):
             print(rancor[i])
         print(Num_MC)
 
@@ -106,7 +105,7 @@ def chi2(npar, grad, fval, xval, iflag):
     strap = 0.
     sbackval = 0.
     sendef = 0.
-    for i in range(1, npoint+1):
+    for i in range(npoint):
         e = epoint[i]
         if iflag != 3:
             if e < emin or e > emax:
@@ -126,7 +125,7 @@ def chi2(npar, grad, fval, xval, iflag):
         sbackval = sbackval + backval[i]
         sendef = sendef + endef[i]
     w = (s - sbackval)/sespec
-    for i in range(1, npoint+1):
+    for i in range(npoint):
         e = epoint[i]
         theor = w * (espec[i] + hnu[i]*hnupr + trspec[i]*backpar + eml[i]*prob_ml) \
             + backval[i] + endef[i]
@@ -154,13 +153,97 @@ def chi2(npar, grad, fval, xval, iflag):
 
     
 def specmlint(e, eml, e0, emax):
-    pass
+    w1, w2, w3 = np.zeros(301), np.zeros(301), np.zeros(301)
+    de, epoint = np.zeros(301), np.zeros(301)
+    slev1, cm1 = np.zeros(301), np.zeros(301)
 
-def expmlspectrum(E, Specml, E0, ac):
-    pass
+    if ifl == 0:
+        ifl += 1
+        print("Missing level spectrum calcuation")
+        # E-=oints nodes list formation
+        for i in range(1, 301+1):
+            de[i] = i*0.2-2.0
+        # End of e-point formation
 
-def specint(E, ESP, E0, SNM, espnm, thick):
-    pass
+        # Spline calculation
+        acc = .001
+        for i in range(1, 301+1):
+            Elow = emax - de[i]
+            if Elow >= emax:
+                slev1[i] = 0
+            else:
+                snm = .0
+                specint(Elow, esp, emax, snm, espnm, thick)
+                accur = esp * acc
+                expmlspectrum(Elow, slev1[i], emax, accur)
+        
+        spline(301, de, slev1, cm1, w1, w2, w3)
+
+        print("Spline is calculated for missing level")
+        with open('spn_MCm1.dat', 'w') as f:
+            for i in range(1, 301+1):
+                print(de[i], slev1[i], cm1[i])
+        
+        if e0 - e < 0:
+            eml = .0
+        else:
+            splint(301, e0-e, eml, de, slev1, cm1)
+    return
+
+def expmlspectrum(e, specml, e0, ac):
+    w, iw = np.zeros(2000), np.zeros(260)
+    pe = e
+    pe0 = e0
+    ifail = 0
+    ERabs = 1.e-4
+    do1ajf(convol_ml, e, e0, ERabs, ac, specml, er, w, 2000, iw, 260, ifail)
+
+def convol_ml(x):
+    truspectrum_ml(x, tspec, pe0)
+    transmission(x-pe, tran)
+    return tspec*tran
+
+def truspectrum_ml(e, tspec, e0):
+    pe = np.sqrt(e*(e+2.0))
+    de = e0 - e
+    de2 = de ** 2
+    if de <= 0.:
+        tspec = 0.
+    else:
+        tspec = de2
+    tspec = fermi(e) * (e+em)/em*pe*tspec/4.e9
+    return
+
+def specint(e, esp, e0, snm, espnm, thick):
+    elev1, prolev1 = np.zeros(193), np.zeros(193)
+    w1, w2, w3 = np.zeros(151), np.zeros(151), np.zeros(151)
+    de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
+    slev1, cm1 = np.zeros(151), np.seros(151)
+    vsnm = np.zeros(110)
+    vneut = np.zeros(151*110).reshape((151, 110))
+    cm201 = np.zeros(151*110).reshape((151, 110))
+    cm221 = np.zeros(151*110).reshape((151, 110))
+    cm021 = np.zeros(151*110).reshape((151, 110))
+
+
+
+
+    if ifl == 0:
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+    return
 
 
 
