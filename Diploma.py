@@ -1,19 +1,44 @@
+from cmath import sqrt
 import numpy as np
 import csv
 
+# constants from FORTRAN COMMON blocks----
 em = 510999.06
 alpha = 1./137.0359895
 thick = .0
 shift = shift2 = .0
-epoint = npoint = .0
-IX, IY, IZ = 1, 255, 25555
+epoint = np.empty(301)
+npoint = 0
+
+#------------------------------------------
+
+# SAVE blocks:
+# chi2-------------
+ifl_chi2 = 0
+Edata = error = np.zeros(301)
+
+# specmlint------------------
+ifl_specmlint = 0
+de, epoint = np.zeros(301), np.zeros(301)
+slev1, cm1 = np.zeros(301), np.zeros(301)
+
+# specint---------------------
+ifl_specint = 0
+thickold = .0
+e0old = .0
+shiftold = 100.
+shift2old = 100.
+
 
 def chi2(npar, grad, fval, xval, iflag):
+    global shift, shift2, epoint, npoint
+    global ifl_chi2
+    global Edata, error
+
     epoint = Edata = error = espnm = np.zeros(301)
     espec = backval = endef = eml = np.zeros(301)
     trspec = hnu = espnm2 = fakesp = np.zeros(301)
     rancor = tspec = np.zeros(301)
-    ifl = 0
 
     e0 = xval[0]+18570.0                # e0 - spectrum endpoint
     s = xval[1]                         # s - spectrum square
@@ -39,8 +64,8 @@ def chi2(npar, grad, fval, xval, iflag):
     prob_ml = xval[19]                  # prob_ml - missing level probability
     acc = .0002
 
-    if ifl == 0:
-        ifl += 1
+    if ifl_chi2 == 0:
+        ifl_chi2 += 1
         
         Num_MC = 0                           # MC simulations counter
 
@@ -70,8 +95,8 @@ def chi2(npar, grad, fval, xval, iflag):
         # Faked spectrum formation--------------------------------------
         w = 96.4
         with open('run_kat_MC2.dat', 'w') as f:
-            print("Simulation with Elow=", Emin, file=f)
-            print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"))
+            print("Simulation with Elow=%f" % (Emin), file=f)
+            print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"), file=f)
             for i in range(npoint):
                 e = epoint[i]
                 specint(e, espec[i], e0, snm, espnm[i], thick)
@@ -154,11 +179,11 @@ def chi2(npar, grad, fval, xval, iflag):
     
 def specmlint(e, eml, e0, emax):
     w1, w2, w3 = np.zeros(301), np.zeros(301), np.zeros(301)
-    de, epoint = np.zeros(301), np.zeros(301)
-    slev1, cm1 = np.zeros(301), np.zeros(301)
 
-    if ifl == 0:
-        ifl += 1
+    global ifl_specmlint, de, slev1, cm1
+
+    if ifl_specmlint == 0:
+        ifl_specmlint += 1
         print("Missing level spectrum calcuation")
         # E-=oints nodes list formation
         for i in range(1, 301+1):
@@ -167,7 +192,7 @@ def specmlint(e, eml, e0, emax):
 
         # Spline calculation
         acc = .001
-        for i in range(1, 301+1):
+        for i in range(301):
             Elow = emax - de[i]
             if Elow >= emax:
                 slev1[i] = 0
@@ -181,7 +206,7 @@ def specmlint(e, eml, e0, emax):
 
         print("Spline is calculated for missing level")
         with open('spn_MCm1.dat', 'w') as f:
-            for i in range(1, 301+1):
+            for i in range(301):
                 print(de[i], slev1[i], cm1[i])
         
         if e0 - e < 0:
@@ -199,8 +224,8 @@ def expmlspectrum(e, specml, e0, ac):
     do1ajf(convol_ml, e, e0, ERabs, ac, specml, er, w, 2000, iw, 260, ifail)
 
 def convol_ml(x):
-    truspectrum_ml(x, tspec, pe0)
-    transmission(x-pe, tran)
+    tspec = truspectrum_ml(x, pe0)
+    tran = transmission(x-pe)
     return tspec*tran
 
 def truspectrum_ml(e, tspec, e0):
@@ -212,7 +237,7 @@ def truspectrum_ml(e, tspec, e0):
     else:
         tspec = de2
     tspec = fermi(e) * (e+em)/em*pe*tspec/4.e9
-    return
+    return tspec
 
 def specint(e, esp, e0, snm, espnm, thick):
     elev1, prolev1 = np.zeros(193), np.zeros(193)
@@ -225,11 +250,59 @@ def specint(e, esp, e0, snm, espnm, thick):
     cm221 = np.zeros(151*110).reshape((151, 110))
     cm021 = np.zeros(151*110).reshape((151, 110))
 
+    name = ["spn_KNM1.dat"]
 
 
 
-    if ifl == 0:
+
+    if ifl_specint == 0:
+        # read exitation level data
+
+        #-----------
         pass
+    if abs(shift2 - shift2old) >= .000001:
+        print("Final states spectrum with shift=%f" % (shift2))
+        slev = 0.
+        sl1 = .57408
+        sl2 = .42077
+        with open("FS_out.dat", "w") as f:
+            for i in range(ist):
+                if elev1[i] <= 5:
+                    prolev[i] = prolev[i] * (sl1 - shift2/100.)/sl1
+                else:
+                    prolev[i] = prolev[i] * (sl1 - shift2/100.)/sl2
+                slev = slev + prolev[i]
+                print(i, elev[i], prolev[i], slev, file=f)
+        
+        ifl_specint += 1
+        if (abs(thick-thickold)>=0.000001 or 
+            abs(shift2-shift2old)>=0.000001 or 
+            abs(shift-shiftold)>=0.000001 or
+            abs(e0-e0old)>15.35):
+
+            e0old = e0
+            thickold = thick
+            shiftold = shift 
+            shift2old = shift2
+            # calculation of new splines
+            print("Needs a spline")
+            for i in [0]:
+                with open(name[i], "r"):
+                    read = f.read()
+                    e0file, thickfile, shiftfile, shift2file = read[0], read[1], read[2], read[3]
+                    if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and
+                    abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001):
+                        print("Reading file=%s with paramters" % (name[i]))
+                        print("Spectrum endpoint=%f" % (e0file))
+                        print("Thickness factor= %f" % (thickfile))
+                        print("Ex/ion shift, %= %f" % (shiftfile))
+                        print("First state shift, %= %f" % (shift2file))
+                        for j in range(151):
+                            pass
+
+
+            
+
 
 
 
@@ -264,3 +337,7 @@ def background(e, e0, back, backpar, backval):
     backval = back + backpar * (18575.0 - e)/40.0
     return
 
+def fermi(e):
+    beta = sqrt(1-(em/(em+e))**2)
+    y = 4*np.pi*alpha/beta
+    return y/abs(1 - exp(-y)) * (1.002037 - 0.001427 * beta)
