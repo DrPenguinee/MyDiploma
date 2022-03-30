@@ -1,4 +1,3 @@
-from cmath import sqrt
 import numpy as np
 import csv
 
@@ -274,31 +273,116 @@ def specint(e, esp, e0, snm, espnm, thick):
                 slev = slev + prolev[i]
                 print(i, elev[i], prolev[i], slev, file=f)
         
-        ifl_specint += 1
-        if (abs(thick-thickold)>=0.000001 or 
-            abs(shift2-shift2old)>=0.000001 or 
-            abs(shift-shiftold)>=0.000001 or
-            abs(e0-e0old)>15.35):
+    ifl_specint += 1
+    if (abs(thick-thickold)>=0.000001 or 
+        abs(shift2-shift2old)>=0.000001 or 
+        abs(shift-shiftold)>=0.000001 or
+        abs(e0-e0old)>15.35):
 
-            e0old = e0
-            thickold = thick
-            shiftold = shift 
-            shift2old = shift2
-            # calculation of new splines
-            print("Needs a spline")
-            for i in [0]:
-                with open(name[i], "r"):
-                    read = f.read()
-                    e0file, thickfile, shiftfile, shift2file = read[0], read[1], read[2], read[3]
-                    if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and
-                    abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001):
-                        print("Reading file=%s with paramters" % (name[i]))
-                        print("Spectrum endpoint=%f" % (e0file))
-                        print("Thickness factor= %f" % (thickfile))
-                        print("Ex/ion shift, %= %f" % (shiftfile))
-                        print("First state shift, %= %f" % (shift2file))
-                        for j in range(151):
-                            pass
+        e0old = e0
+        thickold = thick
+        shiftold = shift 
+        shift2old = shift2
+        # calculation of new splines
+        print("Needs a spline")
+        index = 0
+        f = open(name[index], "r")
+        read = f.read()
+        e0file, thickfile, shiftfile, shift2file = read[0], read[1], read[2], read[3]
+        if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and
+        abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001):
+            print("Reading file=%s with paramters" % (name[i]))
+            print("Spectrum endpoint=%f" % (e0file))
+            print("Thickness factor= %f" % (thickfile))
+            print("Ex/ion shift, %= %f" % (shiftfile))
+            print("First state shift, %= %f" % (shift2file))
+            for j in range(151):
+                de[j], slev1[j], cm1[j] = read[3*j+3], read[3*j+4], read[3*j+5]
+            for j in range(110):
+                vsnm[j] = read[j+458]
+            for j in range(110):
+                for k in range(151):
+                    vneut1[k][j] = read[568 + 151*j + k]
+            f.close()
+            spline(151, de, slev1, cm1, w1, w2, w3)
+            spline2(151, 110, vneut, de, vsnm, cm201, cm221, cm021)
+            splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
+            splint(151, e0-e, esp, de, slev1, cm1)
+            esp += espnm
+            return
+        else:
+            f.close()
+            print("New spline should be calculated")
+            print(e0)
+            # e-points nodes list formation
+            for i in range(9):
+                enode[i] = 19261.0-100.0*(i+1)
+                print(i, enode[i])
+            for i in range(10, 36+1):
+                enode[i] = epoint[36-i] + 0.5
+                print(i, enode[i])
+            for i in range(37, 47+1):
+                enode[i] = epoint[0] - 2*(i-37+1)
+                print(i, enode[i])
+            for i in range(48, 149+1):
+                enode[i] = enode[47]-100*(i-48+1)
+                print(i, enode[i])
+            # end of e-point formation
+
+            # snm point formation
+            vsnm[35] = 0.
+            for i in range(1, 20+1):
+                vsnm[35+i]=0.05*i
+                vsnm[35-i]=-vsnm[35+i]
+            for i in range(21, 35+1):
+                vsnm[35+i]=0.2*(i-20)+1
+                vsnm[35-i]=-vsnm[35+i]
+            for i in range(71, 109+1):
+                vsnm[i]= 4+4*(i-70)**2
+            # end of snm point formation
+
+            ac=.0001
+
+            for i in range(151):
+                de[i] = e0 - enode[i]
+                elow = enode[i]
+                vneut1[i][35]=0
+                if elow >= e0 - elev1[0]:
+                    slev1[i] = 0
+                else:
+                    snmt = 0.
+                    expspectrum(elow, slev1[i], e0, snmt, ac, 3)
+                for j in range(35):
+                    snmt = vsnm[35+j+1]
+                    if elow >= e0 - elev1[0]:
+                        snmspec = 0
+                    else:
+                        expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
+                    vneut1[i][35+j+1] = snmspec
+                    vneut1[i][35-j-1] = -snmspec
+                for j in range(71, 109+1):
+                    snmt = vsnm[j]
+                    if elow >= e0-elev1[0]:
+                        snmspec = 0
+                    else:
+                        expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
+                    vneut1[i][j]=snmspec
+            
+            spline(151, de, slev1, cm1, w1, w2, w3)
+            spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
+
+            print("New splines are calculated with:")
+            print("Endpoint energy=%f" % (e0))
+            print("Thickness factor= %f" % (thick))
+            print("Ex/ion shift, %= %f" % (shift))
+            print("First state shift, %= %f" % (shift2))
+            with open("spn_last.dat", "w") as f:
+                print(e0, thick, shift, shift2)
+                for j in range(151):
+                    print(de[j], slev1[j], cm1[j])
+                
+
+
 
 
             
@@ -327,9 +411,9 @@ def transmission(entr):
 
 
 
-def endeffect(e, eend, step, endef):
+def endeffect(e, eend, step):
     energy = eend - e
-    transmission(energy, tran)
+    tran = transmission(energy)
     endef = tran * step
     return
 
@@ -338,6 +422,6 @@ def background(e, e0, back, backpar, backval):
     return
 
 def fermi(e):
-    beta = sqrt(1-(em/(em+e))**2)
+    beta = np.sqrt(1-(em/(em+e))**2)
     y = 4*np.pi*alpha/beta
     return y/abs(1 - exp(-y)) * (1.002037 - 0.001427 * beta)
