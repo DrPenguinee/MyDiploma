@@ -1,20 +1,61 @@
 import numpy as np
 import csv
 
-# constants from FORTRAN COMMON blocks----
+
+
+
+# COMMON blocks:
+
+# common/const
 em = 510999.06
 alpha = 1./137.0359895
+
+# common/source
 thick = .0
-shift = shift2 = .0
+
+# common/resfun
+shift =  .0
+shift2 = .0
+
+# common/lattice
 epoint = np.empty(301)
 npoint = 0
 
+# common/energy_ml
+pe = .0
+pe0 = .0
+
+# common/levdat
+elev = np.zeros(193)
+prolev = np.zeros(193)
+ist = 0
+
+# common/energy
+pe = .0
+pe0 = .0
+psnm = .0
+ntype = .0
+
+# common/trapco
+e1 = .0
+e2 = .0
+
+# common/temp
+tspec = .0
+scprob = .0
+
+
 #------------------------------------------
 
+
+
+
 # SAVE blocks:
+
 # chi2-------------
 ifl_chi2 = 0
-Edata = error = np.zeros(301)
+Edata = np.zeros(301)
+error = np.zeros(301)
 
 # specmlint------------------
 ifl_specmlint = 0
@@ -27,12 +68,37 @@ thickold = .0
 e0old = .0
 shiftold = 100.
 shift2old = 100.
+elev1, prolev1 = np.zeros(193), np.zeros(193)
+de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
+slev1, cm1 = np.zeros(151), np.seros(151)
+vsnm = np.zeros(110)
+vneut1 = np.zeros(151*110).reshape((151, 110))
+cm201 = np.zeros(151*110).reshape((151, 110))
+cm221 = np.zeros(151*110).reshape((151, 110))
+cm021 = np.zeros(151*110).reshape((151, 110))
+
+# scatprob------------------------
+en, s1, g1 = np.zeros(221), np.zeros(221), np.zeros(221)
+ifl_scatprob = 0
+
+#------------------------------------------------
+
+
+
 
 
 def chi2(npar, grad, fval, xval, iflag):
-    global shift, shift2, epoint, npoint
+    # common------------------
+    global thick # source
+    global shift, shift2 # resfun
+    global epoint, npoint # lattice
+    # ------------------------
+
+    # save--------------------
     global ifl_chi2
     global Edata, error
+    # ------------------------
+
 
     epoint = Edata = error = espnm = np.zeros(301)
     espec = backval = endef = eml = np.zeros(301)
@@ -135,8 +201,8 @@ def chi2(npar, grad, fval, xval, iflag):
             if e < emin or e > emax:
                 continue
         if ntype == 1:
-            spectint(e, espec[i], e0, snm, espnm[i], thick)
-            spectint(e, hnu[i], e0, snm, espnm[i], thick)
+            specint(e, espec[i], e0, snm, espnm[i], thick)
+            specint(e, hnu[i], e0, snm, espnm[i], thick)
         if ntype == 2:
             expspectrum(e, espec[i], e0, snm, ACC)
             expspectrum(e, hnu[i], e0, snm2, ACC)
@@ -177,9 +243,16 @@ def chi2(npar, grad, fval, xval, iflag):
 
     
 def specmlint(e, eml, e0, emax):
+    # common--------------------
+    global thick # source 
+    # --------------------------
+
+    # save----------------------
+    global ifl_specmlint, de, slev1, cm1
+    # --------------------------
+
     w1, w2, w3 = np.zeros(301), np.zeros(301), np.zeros(301)
 
-    global ifl_specmlint, de, slev1, cm1
 
     if ifl_specmlint == 0:
         ifl_specmlint += 1
@@ -215,6 +288,10 @@ def specmlint(e, eml, e0, emax):
     return
 
 def expmlspectrum(e, specml, e0, ac):
+    # common-------------
+    global pe, pe0 # energy_ml
+    # -------------------
+
     w, iw = np.zeros(2000), np.zeros(260)
     pe = e
     pe0 = e0
@@ -239,12 +316,26 @@ def truspectrum_ml(e, tspec, e0):
     return tspec
 
 def specint(e, esp, e0, snm, espnm, thick):
-    elev1, prolev1 = np.zeros(193), np.zeros(193)
+    # common------------------
+    global elev, prolev, ist # levdat
+    global shift, shift2 # resfun
+    global epoint, npoint # lattice
+    # ------------------------
+
+    # save--------------------
+    global ifl_specint, de, thickold, shiftold, shift2old, e0old
+    global vsnm, vneut1, cm201, cm221, cm021
+    global elev1, prolev1, enode, slev, cm1
+    # ------------------------
+
+
+    
     w1, w2, w3 = np.zeros(151), np.zeros(151), np.zeros(151)
+    elev1, prolev1 = np.zeros(193), np.zeros(193)
     de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
     slev1, cm1 = np.zeros(151), np.seros(151)
     vsnm = np.zeros(110)
-    vneut = np.zeros(151*110).reshape((151, 110))
+    vneut1 = np.zeros(151*110).reshape((151, 110))
     cm201 = np.zeros(151*110).reshape((151, 110))
     cm221 = np.zeros(151*110).reshape((151, 110))
     cm021 = np.zeros(151*110).reshape((151, 110))
@@ -404,22 +495,166 @@ def specint(e, esp, e0, snm, espnm, thick):
 
 
 
-def transmission(entr):
-    return
-    #
-    #
-
-
 
 def endeffect(e, eend, step):
     energy = eend - e
     tran = transmission(energy)
-    endef = tran * step
-    return
+    return  tran * step
 
 def background(e, e0, back, backpar, backval):
     backval = back + backpar * (18575.0 - e)/40.0
     return
+
+def expspectrum(e, espec, e0, snm, ac, ntyp):
+    # common -------------------
+    global pe, pe0, psnm, ntype
+    # --------------------------
+
+    pe = e
+    pe0 = e0
+    psnm = snm
+    ntype = ntyp
+    ifail = 0
+    if ntyp < 7:
+        erabs = 1.e-10
+        d01ajf(convol, e, e0,erabs, ac, espec, er_t, w, 2000, iw, 260, ifail)
+    else:
+        errel = 1.e-10
+        d01ajf(convol, e, e0, ac, errel, espec, er_t, w, 2000, iw, 260, ifail)
+    return
+
+def convol(x):
+    # common-------------------------------
+    global pe, pe0, psnm, ntype # energy
+    # -------------------------------------
+    tspec = truspectrum(x, pe0, psnm, ntype)
+    tran = transmission(x-pe)
+    return tspec*tran
+
+def trapbackground():
+    pass
+
+def conlin(x):
+    trap = trapsp(x, pe0)
+    tran = transmission(x-pe)
+    conlin = trap * tran
+
+def trapsp(e, e0):
+    pass
+
+def ftrap(x):
+    # common ------------------
+    global e1, e2 # trapco
+    global tspec, scprob # temp
+    # -------------------------
+
+    snmt = 0.
+    nt = 6
+    tspec = truspectrum(x, e2, snmt, nt)
+    scprob = scatprob(e1, x, e2)
+    return tspec * scprob
+
+def scatprob(e, ep, e0):
+
+    # save----------------
+    global ifl_scatprob
+    global en, s1, g1
+    # --------------------
+
+    w1, w2, w3 = np.zeros(221), np.zeros(221), np.zeros(221)
+
+    ifl_scatprob += 1
+    if ifl_scatprob == 1:
+        with open("Nscat.dat", "r") as f:
+            for i in range(221):
+                pass
+            spline(221, en, s1, g1, w1, w2, w3)
+    
+    if ep - e < 0.:
+        prob = .0
+    else:
+        splint(221, ep-e, prob, en, s2, g1) #!!!!!
+    return prob
+
+def truspectrum(e, e0, snm, ntype):
+    # common ----------------------------------
+    global elev, prolev, ist # levdat
+    # -----------------------------------------
+
+    pe = np.sqrt(e*(e+2*em))
+    tspec = 0
+
+    for i in range(ist):
+        if ntype == 1: # mainz aprroximation
+            de = e0 - elev[i] - e
+            de2 = de**2
+            if snm >= -1.e-8:
+                if de < .0 or de2 < snm:
+                    continue
+                fuck = de
+            if snm < -1.e-8:
+                vmu = .76*np.sqrt(-snm)
+                if de < -vmu:
+                    continue
+            fuck = de + vmu*np.exp(-de/vmu - 1)
+            tspec = tspec + prolev[i]*fuck*np.sqrt(de2-snm)
+
+        if ntype == 2:
+            de = e0 - elev[i] - e
+            de2 = de**2
+            if de <= .0:
+                continue
+            tspec = tspec + prolev[i]*(de2 - snm/2)
+
+        if ntype == 3:
+            de = e0 - elev[i] - e
+            de2 = de**2
+            if de <= .0:
+                continue
+            tspec = tspec + prolev[i]*de2
+
+        if ntype == 6:
+            de - e0 - elev[i] - e
+            de2 = de**2
+            if de <= .0:
+                continue
+            if de2 > abs(snm):
+                dtspec = de*np.sqrt(de2-abs(snm)) - de2
+            else:
+                dtspec = -de2
+            if snm >= .0:
+                tspec = tspec + prolev[i]*(de2+dtspec)
+            else:
+                tspec = tspec + prolev[i]*(de2-dtspec)
+        
+        if ntype == 7:
+            de = e0 - elev[i] - e
+            de2 = de**2
+            if de <= .0:
+                continue
+            if de2 > abs(snm):
+                dtspec = de*np.sqrt(de2-abs(snm)) - de2
+            else:
+                dtspec = -de2
+            if snm >= 0:
+                tspec = tspec + prolev[i]*dtspec
+            else:
+                tspec = tspec + prolev[i]*(-dtspec)
+
+    if ist == 193 and ntype != 7:
+        if e0-e > 165:
+            tail = fstail(e,e0)
+            tspec = tspec + tail
+    tspec = fermi(e) * (e+em)/em*pe*tspec/4.e9
+    return tspec
+
+
+
+def transmission(energy):
+    pass
+
+def RFCAL_KATRIN(fac, e, rf, gmr):
+    pass
 
 def fermi(e):
     beta = np.sqrt(1-(em/(em+e))**2)
