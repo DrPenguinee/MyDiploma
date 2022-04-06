@@ -173,7 +173,7 @@ def chi2(npar, grad, fval, xval, iflag):
                 backval[i] = backval[i]
                 fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
                 Edata[i] = fakesp[i]
-                print(e, Edata[i], error[i])
+                print(e, Edata[i], error[i], file=f)
         # Faked spectrum formed--------------------------------------------
 
     if iflag == 5:
@@ -470,30 +470,15 @@ def specint(e, esp, e0, snm, espnm, thick):
             with open("spn_last.dat", "w") as f:
                 print(e0, thick, shift, shift2)
                 for j in range(151):
-                    print(de[j], slev1[j], cm1[j])
-                
-
-
-
-
+                    print(de[j], slev1[j], cm1[j], file = f)
+                for j in range(110):
+                    for k in range(151):
+                        print(vneut1[k][j])
             
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    return
-
-
+            splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
+            splint(151, e0-e, esp, de, slev1, cm1)
+            esp += espnm
+            return
 
 
 def endeffect(e, eend, step):
@@ -659,4 +644,4 @@ def RFCAL_KATRIN(fac, e, rf, gmr):
 def fermi(e):
     beta = np.sqrt(1-(em/(em+e))**2)
     y = 4*np.pi*alpha/beta
-    return y/abs(1 - exp(-y)) * (1.002037 - 0.001427 * beta)
+    return y/abs(1 - np.exp(-y)) * (1.002037 - 0.001427 * beta)
