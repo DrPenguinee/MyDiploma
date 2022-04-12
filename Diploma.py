@@ -2,8 +2,6 @@ import numpy as np
 import csv
 
 
-
-
 # COMMON blocks:
 
 # common/const
@@ -46,7 +44,6 @@ scprob = .0
 
 
 #------------------------------------------
-
 
 
 
@@ -100,10 +97,10 @@ def chi2(npar, grad, fval, xval, iflag):
     # ------------------------
 
 
-    epoint = Edata = error = espnm = np.zeros(301)
-    espec = backval = endef = eml = np.zeros(301)
-    trspec = hnu = espnm2 = fakesp = np.zeros(301)
-    rancor = tspec = np.zeros(301)
+    epoint, Edata, error, espnm = np.zeros(301), np.zeros(301), np.zeros(301), np.zeros(301)
+    espec, backval, endef, eml = np.zeros(301), np.zeros(301), np.zeros(301), np.zeros(301)
+    trspec, hnu, espnm2, fakesp = np.zeros(301), np.zeros(301), np.zeros(301), np.zeros(301)
+    rancor, tspec = np.zeros(301), np.zeros(301)
 
     e0 = xval[0]+18570.0                # e0 - spectrum endpoint
     s = xval[1]                         # s - spectrum square
@@ -139,13 +136,13 @@ def chi2(npar, grad, fval, xval, iflag):
 
         with open('knm1.dat', 'r') as f:
             reader = csv.reader(f, delimiter=' ')
-            m = 0
+            i = 0
             for row in reader:
-                epoint[m] = 1000 * float(row[0])
-                Edata[m] = float(row[1])
-                error[m] = float(row[2])
-                m+=1
-                print("%3d %10.1f %11.6f %13.8f\n" % (m, epoint[m], Edata[m], error[m]))
+                epoint[i] = 1000 * float(row[0])
+                Edata[i] = float(row[1])
+                error[i] = float(row[2])
+                i+=1
+                print("%3d %10.1f %11.6f %13.8f\n" % (i, epoint[i], Edata[i], error[i]))
 
         
         # Arrays calculation
@@ -154,13 +151,13 @@ def chi2(npar, grad, fval, xval, iflag):
             tran = transmission(entr)
             # fstail(e0 - entr - 165., e0, tail)
             specint(e0 - entr, vesp, e0, snm, vespnm, thick)
-            print(entr, tran, tail)
+            print(entr, tran)
         # Arrays calculated
 
         # Faked spectrum formation--------------------------------------
         w = 96.4
         with open('run_kat_MC2.dat', 'w') as f:
-            print("Simulation with Elow=%f" % (Emin), file=f)
+            print("Simulation with Elow=%f" % (emin), file=f)
             print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"), file=f)
             for i in range(npoint):
                 e = epoint[i]
@@ -168,9 +165,9 @@ def chi2(npar, grad, fval, xval, iflag):
                 specint(e, hnu[i], e0, snm2, espnm2[i], thick)
                 specmlint(e, eml[i], pos_ml, e0)
                 trapbackground(e, trspec[i], e0)
-                endeffect(e, eend, step, endef[i])
-                background (e, e0, back, backpar, backval[i])
-                backval[i] = backval[i]
+                endef[i] = endeffect(e, eend, step)
+                backval[i] = background(e, e0, back, backpar)
+                # backval[i] = backval[i]
                 fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
                 Edata[i] = fakesp[i]
                 print(e, Edata[i], error[i], file=f)
@@ -204,11 +201,11 @@ def chi2(npar, grad, fval, xval, iflag):
             specint(e, espec[i], e0, snm, espnm[i], thick)
             specint(e, hnu[i], e0, snm, espnm[i], thick)
         if ntype == 2:
-            expspectrum(e, espec[i], e0, snm, ACC)
-            expspectrum(e, hnu[i], e0, snm2, ACC)
+            expspectrum(e, espec[i], e0, snm, acc)
+            expspectrum(e, hnu[i], e0, snm2, acc)
         specmlint(e, eml[i], pos_ml, e0)
         background(e, e0, back, backpar, backval[i])
-        endeffect(e, eend, step, endef[i])
+        endef[i] = endeffect(e, eend, step)
         # if
         sespec = sespec + espec[i] + hnu[i]*hnupr
         sml = sml +eml[i]*prob_ml
@@ -239,7 +236,7 @@ def chi2(npar, grad, fval, xval, iflag):
         if abs(dif) > cut:
             continue
         fval += dif ** 2
-    return
+    return fval
 
     
 def specmlint(e, eml, e0, emax):
@@ -256,8 +253,7 @@ def specmlint(e, eml, e0, emax):
 
     if ifl_specmlint == 0:
         ifl_specmlint += 1
-        print("Missing level spectrum calcuation")
-        # E-=oints nodes list formation
+        print("Missing level spectrum calcuation")        # E-=oints nodes list formation
         for i in range(1, 301+1):
             de[i] = i*0.2-2.0
         # End of e-point formation
@@ -484,9 +480,9 @@ def specint(e, esp, e0, snm, espnm, thick):
 def endeffect(e, eend, step):
     energy = eend - e
     tran = transmission(energy)
-    return  tran * step
+    return tran * step
 
-def background(e, e0, back, backpar, backval):
+def background(e, e0, back, backpar):
     backval = back + backpar * (18575.0 - e)/40.0
     return
 
