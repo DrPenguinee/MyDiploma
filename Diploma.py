@@ -1,4 +1,6 @@
 import numpy as np
+from scipy import interpolate
+
 import csv
 
 
@@ -84,7 +86,7 @@ ifl_scatprob = 0
 
 
 
-def chi2(npar, grad, fval, xval, iflag):
+def chi2(npar, grad, xval, iflag):
     # common------------------
     global thick # source
     global shift, shift2 # resfun
@@ -141,8 +143,9 @@ def chi2(npar, grad, fval, xval, iflag):
                 epoint[i] = 1000 * float(row[0])
                 Edata[i] = float(row[1])
                 error[i] = float(row[2])
-                i+=1
                 print("%3d %10.1f %11.6f %13.8f\n" % (i, epoint[i], Edata[i], error[i]))
+                i+=1
+                
 
         
         # Arrays calculation
@@ -163,7 +166,7 @@ def chi2(npar, grad, fval, xval, iflag):
                 e = epoint[i]
                 specint(e, espec[i], e0, snm, espnm[i], thick)
                 specint(e, hnu[i], e0, snm2, espnm2[i], thick)
-                specmlint(e, eml[i], pos_ml, e0)
+                eml[i] = specmlint(e, pos_ml, e0)
                 trapbackground(e, trspec[i], e0)
                 endef[i] = endeffect(e, eend, step)
                 backval[i] = background(e, e0, back, backpar)
@@ -203,14 +206,15 @@ def chi2(npar, grad, fval, xval, iflag):
         if ntype == 2:
             expspectrum(e, espec[i], e0, snm, acc)
             expspectrum(e, hnu[i], e0, snm2, acc)
-        specmlint(e, eml[i], pos_ml, e0)
-        background(e, e0, back, backpar, backval[i])
+        eml[i] = specmlint(e, pos_ml, e0)
+        backval[i] = background(e, e0, back, backpar)
         endef[i] = endeffect(e, eend, step)
         # if
-        sespec = sespec + espec[i] + hnu[i]*hnupr
-        sml = sml +eml[i]*prob_ml
-        sbackval = sbackval + backval[i]
-        sendef = sendef + endef[i]
+        if not(e < emin - .01 or e > emax):
+            sespec += espec[i] + hnu[i]*hnupr
+            sml += eml[i]*prob_ml
+            sbackval += backval[i]
+            sendef += endef[i]
     w = (s - sbackval)/sespec
     for i in range(npoint):
         e = epoint[i]
@@ -239,7 +243,7 @@ def chi2(npar, grad, fval, xval, iflag):
     return fval
 
     
-def specmlint(e, eml, e0, emax):
+def specmlint(e, e0, emax):
     # common--------------------
     global thick # source 
     # --------------------------
@@ -281,7 +285,7 @@ def specmlint(e, eml, e0, emax):
             eml = .0
         else:
             splint(301, e0-e, eml, de, slev1, cm1)
-    return
+    return eml
 
 def expmlspectrum(e, specml, e0, ac):
     # common-------------
@@ -326,7 +330,6 @@ def specint(e, esp, e0, snm, espnm, thick):
 
 
     
-    w1, w2, w3 = np.zeros(151), np.zeros(151), np.zeros(151)
     elev1, prolev1 = np.zeros(193), np.zeros(193)
     de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
     slev1, cm1 = np.zeros(151), np.seros(151)
@@ -391,10 +394,13 @@ def specint(e, esp, e0, snm, espnm, thick):
                 for k in range(151):
                     vneut1[k][j] = read[568 + 151*j + k]
             f.close()
-            spline(151, de, slev1, cm1, w1, w2, w3)
-            spline2(151, 110, vneut, de, vsnm, cm201, cm221, cm021)
-            splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
-            splint(151, e0-e, esp, de, slev1, cm1)
+            
+            spline2 = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
+            espnm = spline2(e0-e, snm) # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
+            
+            spline = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
+            esp = spline(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
+
             esp += espnm
             return
         else:
@@ -455,8 +461,8 @@ def specint(e, esp, e0, snm, espnm, thick):
                         expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
                     vneut1[i][j]=snmspec
             
-            spline(151, de, slev1, cm1, w1, w2, w3)
-            spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
+            spline = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
+            spline2 = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
 
             print("New splines are calculated with:")
             print("Endpoint energy=%f" % (e0))
