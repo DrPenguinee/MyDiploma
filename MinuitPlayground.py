@@ -1,11 +1,9 @@
-# import numpy as np
-# import iminuit
+from Playground import chi2
+import numpy as np
 from iminuit import Minuit
 
 
-def chi2(a, b):
-    return a**2 + (b-3)**2
-
-
-m = Minuit(chi2, a=1, b=1)
+m = Minuit(chi2, tuple(np.zeros(3)))
+m.errordef = Minuit.LEAST_SQUARES
 m.migrad()
+print(m.values)
