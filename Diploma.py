@@ -23,8 +23,8 @@ epoint = np.empty(301)
 npoint = 0
 
 # common/energy_ml
-pe = .0
-pe0 = .0
+pe_eml = .0
+pe0_eml = .0
 
 # common/levdat
 elev = np.zeros(193)
@@ -32,8 +32,8 @@ prolev = np.zeros(193)
 ist = 0
 
 # common/energy
-pe = .0
-pe0 = .0
+pe_e = .0
+pe0_e = .0
 psnm = .0
 ntype = .0
 
@@ -53,6 +53,9 @@ theta_max = 0.
 
 # common/DESPL
 sxt, E0 = 0., 0.
+
+# common/conl
+pe_c, pe0_c = 0., 0.
 
 
 #------------------------------------------
@@ -96,9 +99,12 @@ theta, P0, P1, P2, P3, P4, P5 = np.zeros(40), np.zeros(40), np.zeros(40), np.zer
 #transmission--------------------------------------
 thickold_t, shiftold_t = 0., 100.
 spline_t = lambda x: 1
+etrans, trans = np.zeros(221), np.zeros(221)
 
+#traps------------------------------
+ifl_trs = 0
 
-
+ifl_tr = 0
 
 #------------------------------------------------
 
@@ -173,7 +179,7 @@ def chi2(xval):
             entr = float(i)
             tran = transmission(entr) # need transmission -> rfcal -> lospat
             # fstail(e0 - entr - 165., e0, tail)
-            vesp, vespnm = specint(e0 - entr, e0, snm, thick)
+            # vesp, vespnm = specint(e0 - entr, e0, snm, thick)
             print(entr, tran)
         # Arrays calculated
 
@@ -306,19 +312,19 @@ def specmlint(e, e0, emax):
 
 def expmlspectrum(e, e0, ac):
     # common-------------
-    global pe, pe0 # energy_ml
+    global pe_eml, pe0_eml # energy_ml
     # -------------------
 
-    pe = e
-    pe0 = e0
+    pe_eml = e
+    pe0_eml = e0
     ifail = 0
     ERabs = 1.e-4
     specml = integrate.quad(convol_ml, e, e0, epsabs=ERabs, epsrel=ac) # do1ajf(convol_ml, e, e0, ERabs, ac, specml, er, w, 2000, iw, 260, ifail)
     return specml
 
 def convol_ml(x):
-    tspec = truspectrum_ml(x, pe0)
-    tran = transmission(x-pe)
+    tspec = truspectrum_ml(x, pe0_eml)
+    tran = transmission(x-pe_eml)
     return tspec*tran
 
 def truspectrum_ml(e, tspec, e0):
@@ -356,7 +362,7 @@ def specint(e, e0, snm, thick):
     cm221 = np.zeros(151*110).reshape((151, 110))
     cm021 = np.zeros(151*110).reshape((151, 110))
 
-    name = ["spn_KNM1.dat"]
+    name = ["vneut1_sample.dat"]
 
 
 
@@ -364,8 +370,13 @@ def specint(e, e0, snm, thick):
     if ifl_specint == 0:
         # read exitation level data
         with open('excitat2.dat', 'r') as f:
-            for i in range(201):
-                pass
+            ist = 0
+            reader = csv.reader(f, delimiter=' ')
+            for row in reader:
+                prolev1[ist] = row[0]
+                prolev[ist] = prolev1[ist] 
+                elev1[ist] = row[1]
+                elev[ist] = elev1[ist] 
 
         #-----------
     if abs(shift2 - shift2old) >= .000001:
@@ -396,22 +407,27 @@ def specint(e, e0, snm, thick):
         print("Needs a spline")
         index = 0
         f = open(name[index], "r")
-        read = f.read()
-        e0file, thickfile, shiftfile, shift2file = read[0], read[1], read[2], read[3]
-        if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and
+        item = list(map(float, f.readline().split() ) )
+        e0file, thickfile, shiftfile, shift2file = item[0], item[1], item[2], item[3]
+        if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and 
         abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001):
             print("Reading file=%s with paramters" % (name[i]))
             print("Spectrum endpoint=%f" % (e0file))
             print("Thickness factor= %f" % (thickfile))
             print("Ex/ion shift, %= %f" % (shiftfile))
             print("First state shift, %= %f" % (shift2file))
-            for j in range(151):
-                de[j], slev1[j], cm1[j] = read[3*j+3], read[3*j+4], read[3*j+5]
+            for j in range(98):
+                item = f.readline().split()
+            for j in range(98):
+                item = list(map(float, f.readline().split() ) )
+                de[j], slev1[j] = item[0], item[1]
             for j in range(110):
-                vsnm[j] = read[j+458]
-            for j in range(110):
-                for k in range(151):
-                    vneut1[k][j] = read[568 + 151*j + k]
+                item = list(map(float, f.readline().split() ) )
+                vsnm[j] = item[1]
+            for j in range(98):
+                for k in range(110):
+                    item = list(map(float, f.readline().split() ) )
+                    vneut1[k][j] = item[2]
             f.close()
             
             spline2 = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
@@ -469,7 +485,7 @@ def specint(e, e0, snm, thick):
                     if elow >= e0 - elev1[0]:
                         snmspec = 0
                     else:
-                        expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
+                        snmspec = expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
                     vneut1[i][35+j+1] = snmspec
                     vneut1[i][35-j-1] = -snmspec
                 for j in range(71, 109+1):
@@ -489,12 +505,14 @@ def specint(e, e0, snm, thick):
             print("Ex/ion shift, %= %f" % (shift))
             print("First state shift, %= %f" % (shift2))
             with open("spn_last.dat", "w") as f:
-                print(e0, thick, shift, shift2)
+                print(e0, thick, shift, shift2, file=f)
                 for j in range(151):
-                    print(de[j], slev1[j], cm1[j], file = f)
+                    print(de[j], slev1[j], file=f)
+                for j in range(151):
+                    print(vsnm[j], file=f)
                 for j in range(110):
                     for k in range(151):
-                        print(vneut1[k][j])
+                        print(vneut1[k][j], file=f)
             
             espnm = spline2(e0-e, snm) # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
             esp = spline(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
@@ -513,11 +531,11 @@ def background(e, e0, back, backpar):
 
 def expspectrum(e, espec, e0, snm, ac, ntyp):
     # common -------------------
-    global pe, pe0, psnm, ntype
+    global pe_e, pe0_e, psnm, ntype
     # --------------------------
 
-    pe = e
-    pe0 = e0
+    pe_e = e
+    pe0_e = e0
     psnm = snm
     ntype = ntyp
     ifail = 0
@@ -531,22 +549,34 @@ def expspectrum(e, espec, e0, snm, ac, ntyp):
 
 def convol(x):
     # common-------------------------------
-    global pe, pe0, psnm, ntype # energy
+    global pe_e, pe0_e, psnm, ntype # energy
     # -------------------------------------
-    tspec = truspectrum(x, pe0, psnm, ntype)
-    tran = transmission(x-pe)
+    tspec = truspectrum(x, pe0_e, psnm, ntype)
+    tran = transmission(x-pe_e)
     return tspec*tran
 
 def trapbackground():
-    pass
+    if ifl_tr == 0:
+        ifl_tr += 1
+        print("Start of trapped electrons background")
+        for i in range(npoint):
+            enode[i] = epoint[npoint - i] + 0.25
+            print(i, enode[i])
+        for i in range(npoint, 98):
+            print(i, enode[i])
+        
+        ac = .0001
+
 
 def conlin(x):
-    trap = trapsp(x, pe0)
-    tran = transmission(x-pe)
+    trap = trapsp(x, pe0_c)
+    tran = transmission(x-pe_c)
     return trap * tran
 
 def trapsp(e, e0):
+    
     pass
+
 
 def ftrap(x):
     # common ------------------
@@ -658,9 +688,7 @@ def truspectrum(e, e0, snm, ntype):
 
 def transmission(energy):
     global spline_t
-    global shiftold_t, thickold_t
-
-    etrans, trans = np.zeros(221), np.zeros(221)
+    global shiftold_t, thickold_t, etrans, trans
 
     if abs(thick - thickold_t) >= 1.0e-6 or abs(shift - shiftold_t >= 1.0e-6):
         thickold_t = thick
