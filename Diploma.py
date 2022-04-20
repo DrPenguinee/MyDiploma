@@ -88,6 +88,8 @@ vneut1 = np.zeros(151*110).reshape((151, 110))
 # cm201 = np.zeros(151*110).reshape((151, 110))
 # cm221 = np.zeros(151*110).reshape((151, 110))
 # cm021 = np.zeros(151*110).reshape((151, 110))
+spline_sp = lambda x: 1
+spline2_sp = lambda x, y: 1
 
 # scatprob------------------------
 en, s1, g1 = np.zeros(221), np.zeros(221), np.zeros(221)
@@ -95,6 +97,12 @@ ifl_scatprob = 0
 
 # ProbCalc_int----------------------------------
 theta, P0, P1, P2, P3, P4, P5 = np.zeros(40), np.zeros(40), np.zeros(40), np.zeros(40), np.zeros(40), np.zeros(40), np.zeros(40)
+spline0_pc = lambda x: 1
+spline1_pc = lambda x: 1
+spline2_pc = lambda x: 1
+spline3_pc = lambda x: 1
+spline4_pc = lambda x: 1
+spline5_pc = lambda x: 1
 
 #transmission--------------------------------------
 thickold_t, shiftold_t = 0., 100.
@@ -349,6 +357,7 @@ def specint(e, e0, snm, thick):
     global ifl_specint, de, thickold, shiftold, shift2old, e0old
     global vsnm, vneut1, cm201, cm221, cm021
     global elev1, prolev1, enode, slev, cm1
+    global spline_sp, spline2_sp
     # ------------------------
 
 
@@ -357,7 +366,7 @@ def specint(e, e0, snm, thick):
     de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
     slev1, cm1 = np.zeros(151), np.zeros(151)
     vsnm = np.zeros(110)
-    vneut1 = np.zeros(151*110).reshape((151, 110))
+    vneut1 = np.zeros(151*110).reshape(151, 110)
     cm201 = np.zeros(151*110).reshape((151, 110))
     cm221 = np.zeros(151*110).reshape((151, 110))
     cm021 = np.zeros(151*110).reshape((151, 110))
@@ -430,11 +439,11 @@ def specint(e, e0, snm, thick):
                     vneut1[k][j] = item[2]
             f.close()
             
-            spline2 = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
-            espnm = spline2(e0-e, snm) # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
+            spline2_sp = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
+            espnm = spline2_sp(e0-e, snm) # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
             
-            spline = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
-            esp = spline(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
+            spline_sp = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
+            esp = spline_sp(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
 
             esp += espnm
             return esp, espnm
@@ -483,21 +492,25 @@ def specint(e, e0, snm, thick):
                 for j in range(35):
                     snmt = vsnm[35+j+1]
                     if elow >= e0 - elev1[0]:
-                        snmspec = 0
+                        snmspec = 0.
                     else:
                         snmspec = expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
-                    vneut1[i][35+j+1] = snmspec
+                    try:
+                        vneut1[i][35+j+1] = snmspec
+                    except:
+                        print(i, j, snmspec)
+                        input()
                     vneut1[i][35-j-1] = -snmspec
                 for j in range(71, 109+1):
                     snmt = vsnm[j]
                     if elow >= e0-elev1[0]:
-                        snmspec = 0
+                        snmspec = 0.
                     else:
                         snmspec = expspectrum(elow, snmspec, e0, snmt, 3*ac*slev1[i],7)
                     vneut1[i][j]=snmspec
             
-            spline = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
-            spline2 = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
+            spline_sp = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
+            spline2_sp = interpolate.interp2d(vneut1, de, vsnm, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
 
             print("New splines are calculated with:")
             print("Endpoint energy=%f" % (e0))
@@ -514,8 +527,8 @@ def specint(e, e0, snm, thick):
                     for k in range(151):
                         print(vneut1[k][j], file=f)
             
-            espnm = spline2(e0-e, snm) # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
-            esp = spline(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
+            espnm = spline2_sp(e0-e, snm) # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
+            esp = spline_sp(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
             esp += espnm
             return esp, espnm
 
@@ -541,10 +554,10 @@ def expspectrum(e, espec, e0, snm, ac, ntyp):
     ifail = 0
     if ntyp < 7:
         erabs = 1.e-10
-        espec = integrate.quad(convol, e, e0, epsabs=erabs, epsrel=ac) # d01ajf(convol, e, e0,erabs, ac, espec, er_t, w, 2000, iw, 260, ifail)
+        espec, err = integrate.quad(convol, e, e0, epsabs=erabs, epsrel=ac) # d01ajf(convol, e, e0,erabs, ac, espec, er_t, w, 2000, iw, 260, ifail)
     else:
         errel = 1.e-10
-        espec = integrate.quad(convol, e, e0, epsabs=ac, epsrel=errel) # d01ajf(convol, e, e0, ac, errel, espec, er_t, w, 2000, iw, 260, ifail)
+        espec, err = integrate.quad(convol, e, e0, epsabs=ac, epsrel=errel) # d01ajf(convol, e, e0, ac, errel, espec, er_t, w, 2000, iw, 260, ifail)
     return espec
 
 def convol(x):
@@ -617,7 +630,9 @@ def truspectrum(e, e0, snm, ntype):
     global elev, prolev, ist # levdat
     # -----------------------------------------
 
+    
     pe = np.sqrt(e*(e+2*em))
+    
     tspec = 0
 
     for i in range(ist):
@@ -673,9 +688,9 @@ def truspectrum(e, e0, snm, ntype):
             else:
                 dtspec = -de2
             if snm >= 0:
-                tspec = tspec + prolev[i]*dtspec
+                tspec += prolev[i]*dtspec
             else:
-                tspec = tspec + prolev[i]*(-dtspec)
+                tspec += prolev[i]*(-dtspec)
 
     if ist == 193 and ntype != 7:
         if e0-e > 165:
@@ -745,6 +760,9 @@ def RFCAL_KATRIN(fac, e, rf, gmr):
     return
 
 def ProbCalc_int(x,sp,theta_max):
+    global P0, P1, P2, P3, P4, P5, theta
+    global spline0_pc, spline1_pc, spline2_pc, spline3_pc, spline4_pc, spline5_pc
+
     if ifl_pc == 0:
         ifl_pc += 1
 
@@ -797,21 +815,21 @@ def ProbCalc_int(x,sp,theta_max):
             P4[i] /= 40 - i
             P5[i] /= 40 - i
         
-        spline0 = interpolate.interp1d(theta, P0, kind='cubic')
-        spline1 = interpolate.interp1d(theta, P1, kind='cubic')
-        spline2 = interpolate.interp1d(theta, P2, kind='cubic')
-        spline3 = interpolate.interp1d(theta, P3, kind='cubic')
-        spline4 = interpolate.interp1d(theta, P4, kind='cubic')
-        spline5 = interpolate.interp1d(theta, P5, kind='cubic')
+        spline0_pc = interpolate.interp1d(theta, P0, kind='cubic')
+        spline1_pc = interpolate.interp1d(theta, P1, kind='cubic')
+        spline2_pc = interpolate.interp1d(theta, P2, kind='cubic')
+        spline3_pc = interpolate.interp1d(theta, P3, kind='cubic')
+        spline4_pc = interpolate.interp1d(theta, P4, kind='cubic')
+        spline5_pc = interpolate.interp1d(theta, P5, kind='cubic')
 
-        sp[0] = spline0(theta_max)
-        sp[1] = spline1(theta_max)
-        sp[2] = spline2(theta_max)
-        sp[3] = spline3(theta_max)
-        sp[4] = spline4(theta_max)
-        sp[5] = spline5(theta_max)
+    sp[0] = spline0_pc(theta_max)
+    sp[1] = spline1_pc(theta_max)
+    sp[2] = spline2_pc(theta_max)
+    sp[3] = spline3_pc(theta_max)
+    sp[4] = spline4_pc(theta_max)
+    sp[5] = spline5_pc(theta_max)
 
-        return
+    return
 
 
 
@@ -946,7 +964,8 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
 
 
 
-def fermi(e):
-    beta = np.sqrt(1-(em/(em+e))**2)
+def fermi(x):
+    global em
+    beta = np.sqrt(1-(em/(em+x))**2)
     y = 4*np.pi*alpha/beta
     return y/abs(1 - np.exp(-y)) * (1.002037 - 0.001427 * beta)
