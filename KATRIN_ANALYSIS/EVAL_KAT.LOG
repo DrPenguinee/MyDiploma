@@ -1,0 +1,49 @@
+ ***************************************************************************
+  MINUIT RELEASE 95.03  INITIALIZED.   DIMENSIONS 100/ 50  EPSMAC=   .89E-15
+ ***************************************************************************
+                          MINUIT DATA BLOCK NO.   1
+ ***************************************************************************
+ KATRIN MC-simulation, FS: Jonsell, Loss: Mainz-Ost
+ ******************************************************************************
+
+ PARAMETER DEFINITIONS:
+    NO.   NAME         VALUE      STEP SIZE      LIMITS
+     1 'SP ENDPOIN'    3.7400       .10000         4.0000       6.0000    
+ MINUIT WARNING IN PARAM DEF
+ ============== STARTING VALUE OUTSIDE LIMITS.
+ MINUIT WARNING IN PARAMETR
+ ============== VARIABLE   1 BROUGHT BACK INSIDE LIMITS.  
+ MINUIT WARNING IN PARAMETR
+ ============== VARIABLE   1 BROUGHT BACK INSIDE LIMITS.  
+     2 'SP NORMAL '    96.400       1.4128         no limits
+     3 'SQ NE MASS'    .00000       3.0000        -3.9000       3.9000    
+     4 'BACKGROUND'    .29300       .13729E-02     .00000       .20000    
+ MINUIT WARNING IN PARAM DEF
+ ============== STARTING VALUE OUTSIDE LIMITS.
+ MINUIT WARNING IN PARAMETR
+ ============== VARIABLE   4 BROUGHT BACK INSIDE LIMITS.  
+ MINUIT WARNING IN PARAMETR
+ ============== VARIABLE   4 BROUGHT BACK INSIDE LIMITS.  
+     5 'BACG slope'    .00000      constant
+     6 'END EFFECT'    .00000      constant
+     7 'STEP ENERG'    570.00       2.1009         500.00       580.00    
+     8 'ex/ion sh%'    .00000      constant
+     9 'fs1 pr sh%'    .00000      constant
+    10 'SOURCE TIC'    .25000      constant
+    11 'LOW ENERG '    18535.      constant
+    12 'UP ENERGY '    18625.      constant
+    13 'Dead time '    .60000E-05  constant
+    14 'calc type '    1.0000      constant
+    15 'Heavy mass'    65.200       1.0000         20.000       120.00    
+    16 'HeaNu Prob'    .00000       .10000E-02    -.10000E-02   .15000    
+ MINUIT WARNING IN PARAMETR
+ ============== VARIABLE  16 IS AT ITS LOWER ALLOWED LIMIT
+    17 'Unvis corr'    .00000       .10000E-02     no limits
+    18 'dif cut   '    10000.      constant
+    19 'MisLev Pos'   -15.500      constant
+    20 'MisLev Pro'    .00000       .10000        -.10000       .20000    
+ MINUIT WARNING IN PARAMETR
+ ============== VARIABLE  20 IS AT ITS LOWER ALLOWED LIMIT
+    ***************************************************************************
+
+ MINUIT: FIRST CALL TO USER FUNCTION, WITH IFLAG=1

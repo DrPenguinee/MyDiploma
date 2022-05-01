@@ -1,7 +1,12 @@
-v = -2
+from scipy import interpolate
+import numpy as np
 
-def chi2(x):
-    return (x[0] - 1)**2 + (x[1] + v)**2 + phi(x[2])
+x = np.array([1., 2., 3., 4.])
+y = np.array([1., 4., 9., 16.])
 
-def phi(t):
-        return (t+1)**2
+x = x[::-1]
+y = y[::-1]
+
+sp = interpolate.interp1d(x, y, kind='cubic')
+print(sp(0.5))
+

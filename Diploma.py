@@ -1,8 +1,7 @@
+import csv
 import numpy as np
 from scipy import interpolate
 from scipy import integrate
-
-import csv
 
 
 # COMMON blocks:
@@ -113,8 +112,9 @@ thickold_t, shiftold_t = 0., 100.
 spline_t = lambda x: 1
 etrans, trans = np.zeros(221), np.zeros(221)
 
-# LOSPAR--------------------------------------------
+# LOSPAT--------------------------------------------
 ifl_ls = 0
+spline1_ls, spline2_ls, spline3_ls, spline4_ls, spline5_ls = np.zeros(5)
 
 #------------------------------------------------
 
@@ -135,7 +135,7 @@ def chi2(xval):
     iflag = 0
 
 
-    epoint, Edata, error, espnm = np.zeros(301), np.zeros(301), np.zeros(301), np.zeros(301)
+    espnm = np.zeros(301)
     espec, backval, endef, eml = np.zeros(301), np.zeros(301), np.zeros(301), np.zeros(301)
     trspec, hnu, espnm2, fakesp = np.zeros(301), np.zeros(301), np.zeros(301), np.zeros(301)
     rancor, tspec = np.zeros(301), np.zeros(301)
@@ -173,14 +173,16 @@ def chi2(xval):
         npoint = 27
 
         with open('knm1.dat', 'r') as f:
-            reader = csv.reader(f, delimiter=' ')
+            reader = f.readlines()
             i = 0
-            for row in reader:
+            for item in reader:
+                row = list(map(float, item.split() ) )
                 epoint[i] = 1000 * float(row[0])
                 Edata[i] = float(row[1])
                 error[i] = float(row[2])
                 print("%3d %10.1f %11.6f %13.8f" % (i, epoint[i], Edata[i], error[i]))
                 i+=1
+            print('')
                 
 
         
@@ -190,26 +192,28 @@ def chi2(xval):
             tran = transmission(entr) # need transmission -> rfcal -> lospat
             # fstail(e0 - entr - 165., e0, tail)
             # vesp, vespnm = specint(e0 - entr, e0, snm, thick)
-            print(entr, tran)
+            print(i, tran)
+        print('')
         # Arrays calculated
 
+
         # Faked spectrum formation--------------------------------------
-        w = 96.4
-        with open('run_kat_MC2.dat', 'w') as f:
-            print("Simulation with Elow=%f" % (emin), file=f)
-            print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"), file=f)
-            for i in range(npoint):
-                e = epoint[i]
-                espec[i], espnm[i] = specint(e, e0, snm, thick) # ok
-                hnu[i], espnm2[i] = specint(e, e0, snm2, thick) # ok
-                eml[i] = specmlint(e, pos_ml, e0) # ok
-                # trapbackground(e, trspec[i], e0)
-                endef[i] = endeffect(e, eend, step)
-                backval[i] = background(e, e0, back, backpar)
-                # backval[i] = backval[i]
-                fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
-                Edata[i] = fakesp[i]
-                print(e, Edata[i], error[i], file=f)
+        # w = 96.4
+        # with open('run_kat_MC2.dat', 'w') as f:
+        #     print("Simulation with Elow=%f" % (emin), file=f)
+        #     print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"), file=f)
+        #     for i in range(npoint):
+        #         e = epoint[i]
+        #         espec[i], espnm[i] = specint(e, e0, snm, thick) # ok
+        #         # hnu[i], espnm2[i] = specint(e, e0, snm2, thick) # ok
+        #         eml[i] = specmlint(e, pos_ml, e0) # ok
+        #         # trapbackground(e, trspec[i], e0)
+        #         # endef[i] = endeffect(e, eend, step)
+        #         backval[i] = background(e, e0, back, backpar)
+        #         # backval[i] = backval[i]
+        #         fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
+        #         Edata[i] = fakesp[i]
+        #         print(e, Edata[i], error[i], file=f)
         # Faked spectrum formed--------------------------------------------
 
     if iflag == 5:
@@ -233,26 +237,30 @@ def chi2(xval):
     sendef = 0.
     for i in range(npoint):
         e = epoint[i]
+        # print("i = %d, e = %f" % (i, e))
         if iflag != 3:
             if e < emin or e > emax:
                 continue
         if ntype == 1:
+            # print("e=%f, e0=%f, snm=%f, thick=%f" % (e, e0, snm, thick))
             espec[i], espnm[i] = specint(e, e0, snm, thick)
-            print(e, e0, snm2, thick)
-            hnu[i], espnm[i] = specint(e, e0, snm2, thick)
+            # print(espec[i])
+            # print('')
+            # hnu[i], espnm[i] = specint(e, e0, snm2, thick)
         if ntype == 2:
             expspectrum(e, espec[i], e0, snm, acc) # need transmission
             expspectrum(e, hnu[i], e0, snm2, acc)
-        eml[i] = specmlint(e, pos_ml, e0)
+        # eml[i] = specmlint(e, pos_ml, e0)
         backval[i] = background(e, e0, back, backpar)
-        endef[i] = endeffect(e, eend, step) # need transmission
+        # endef[i] = endeffect(e, eend, step) # need transmission
         # if
-        if not(e < emin - .01 or e > emax):
-            sespec += espec[i] + hnu[i]*hnupr
-            sml += eml[i]*prob_ml
-            sbackval += backval[i]
-            sendef += endef[i]
-    print(s, sbackval, sespec)
+        if e < emin - .01 or e > emax:
+            continue
+        sespec += espec[i] + hnu[i]*hnupr
+        sml += eml[i]*prob_ml
+        sbackval += backval[i]
+        # sendef += endef[i]
+    print("s = %f, sbackval = %f, sespec = %f" % (s, sbackval, sespec))
     w = (s - sbackval)/sespec
     for i in range(npoint):
         e = epoint[i]
@@ -293,8 +301,8 @@ def specmlint(e, e0, emax):
     if ifl_specmlint == 0:
         ifl_specmlint += 1
         print("Missing level spectrum calcuation")        # E-=oints nodes list formation
-        for i in range(1, 301+1):
-            de_sl[i-1] = i*0.2-2.0
+        for i in range(301):
+            de_sl[i] = (i+1)*0.2-2.0
         # End of e-point formation
 
         # Spline calculation
@@ -302,7 +310,7 @@ def specmlint(e, e0, emax):
         for i in range(301):
             Elow = emax - de_sl[i]
             if Elow >= emax:
-                slev1_sl [i] = 0
+                slev1_sl[i] = 0
             else:
                 snm = .0
                 esp, espnm = specint(Elow, emax, snm, thick)
@@ -389,7 +397,8 @@ def specint(e, e0, snm, thick):
                 prolev1[ist] = row[0]
                 prolev[ist] = prolev1[ist] 
                 elev1[ist] = row[1]
-                elev[ist] = elev1[ist] 
+                elev[ist] = elev1[ist]
+                ist += 1
 
         #-----------
     if abs(shift2 - shift2old) >= .000001:
@@ -411,7 +420,7 @@ def specint(e, e0, snm, thick):
         abs(shift2-shift2old)>=0.000001 or 
         abs(shift-shiftold)>=0.000001 or
         abs(e0-e0old)>15.35):
-
+        
         e0old = e0
         thickold = thick
         shiftold = shift 
@@ -424,11 +433,11 @@ def specint(e, e0, snm, thick):
         e0file, thickfile, shiftfile, shift2file = item[0], item[1], item[2], item[3]
         if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and 
         abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001):
-            print("Reading file=%s with paramters" % (name[i]))
-            print("Spectrum endpoint=%f" % (e0file))
-            print("Thickness factor= %f" % (thickfile))
-            print("Ex/ion shift, %= %f" % (shiftfile))
-            print("First state shift, %= %f" % (shift2file))
+            print("Reading file          = %s with paramters" % (name[0]))
+            print("Spectrum endpoint     = %f" % (e0file))
+            print("Thickness factor      = %f" % (thickfile))
+            print("Ex/ion shift, %%       = %f" % (shiftfile))
+            print("First state shift, %%  = %f" % (shift2file))
             for j in range(98):
                 item = f.readline().split()
             for j in range(98):
@@ -440,13 +449,13 @@ def specint(e, e0, snm, thick):
             for j in range(98):
                 for k in range(110):
                     item = list(map(float, f.readline().split() ) )
-                    vneut1[k][j] = item[2]
+                    vneut1[j][k] = item[2]
             f.close()
             
-            spline2_sp = interpolate.interp2d(vsnm,de, vneut1, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
+            spline2_sp = interpolate.interp2d(vsnm, de, vneut1, kind = 'cubic') # spline2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021)
             espnm = spline2_sp(snm, e0-e)[0] # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
             
-            spline_sp = interpolate.interp1d(de, slev1, kind = 'cubic') # spline(151, de, slev1, cm1, w1, w2, w3)
+            spline_sp = interpolate.interp1d(de, slev1, kind = 'cubic', fill_value='extrapolate') # spline(151, de, slev1, cm1, w1, w2, w3)
             esp = spline_sp(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
 
             esp += espnm
@@ -454,19 +463,19 @@ def specint(e, e0, snm, thick):
         else:
             f.close()
             print("New spline should be calculated")
-            print(e0)
+            # input()
             # e-points nodes list formation
             for i in range(9):
-                enode[i] = 19261.0-100.0*(i+1)
+                enode[i] = 19621.0-100.0*(i+1)
                 print(i, enode[i])
             for i in range(10, 36+1):
                 enode[i] = epoint[36-i] + 0.5
                 print(i, enode[i])
             for i in range(37, 47+1):
-                enode[i] = epoint[0] - 2*(i-37+1)
+                enode[i] = epoint[0] - 2*(i-36)
                 print(i, enode[i])
-            for i in range(48, 98):
-                enode[i] = enode[47]-100*(i-48+1)
+            for i in range(48, 97+1):
+                enode[i] = enode[47]-100*(i-47)
                 print(i, enode[i])
             # end of e-point formation
 
@@ -492,7 +501,7 @@ def specint(e, e0, snm, thick):
                     slev1[i] = 0
                 else:
                     snmt = 0.
-                    expspectrum(elow, slev1[i], e0, snmt, ac, 3)
+                    slev1[i] = expspectrum(elow, slev1[i], e0, snmt, ac, 3)
                 for j in range(35):
                     snmt = vsnm[35+j+1]
                     if elow >= e0 - elev1[0]:
@@ -516,19 +525,21 @@ def specint(e, e0, snm, thick):
             print("New splines are calculated with:")
             print("Endpoint energy=%f" % (e0))
             print("Thickness factor= %f" % (thick))
-            print("Ex/ion shift, = %f" % (shift))
-            print("First state shift, percent = %f" % (shift2))
+            print("Ex/ion shift, %%= %f" % (shift))
+            print("First state shift, %%= %f" % (shift2))
             with open("spn_last.dat", "w") as f:
                 print(e0, thick, shift, shift2, file=f)
                 for j in range(98):
                     print(de[j], slev1[j], file=f)
                 for j in range(98):
                     print(vsnm[j], file=f)
-                for j in range(110):
-                    for k in range(98):
-                        print(vneut1[k][j], file=f)
-            
+                for j in range(98):
+                    for k in range(110):
+                        print(vneut1[j][k], file=f)
+
+
     espnm = spline2_sp(snm, e0-e)[0] # splint2(151, 110, vneut1, de, vsnm, cm201, cm221, cm021, e0-e, snm, espnm, dx, dy, 0, ifail)
+    # print(e0-e, e0, e)
     esp = spline_sp(e0-e) # splint(151, e0-e, esp, de, slev1, cm1)
     esp += espnm
     return esp, espnm
@@ -541,7 +552,7 @@ def endeffect(e, eend, step):
 
 def background(e, e0, back, backpar):
     backval = back + backpar * (18575.0 - e)/40.0
-    return
+    return backval
 
 def expspectrum(e, espec, e0, snm, ac, ntyp):
     # common -------------------
@@ -582,48 +593,47 @@ def trapbackground():
         ac = .0001
 
 
-def conlin(x):
-    trap = trapsp(x, pe0_c)
-    tran = transmission(x-pe_c)
-    return trap * tran
+# def conlin(x):
+#     trap = trapsp(x, pe0_c)
+#     tran = transmission(x-pe_c)
+#     return trap * tran
 
-def trapsp(e, e0):
+# def trapsp(e, e0):
+#     pass
+
+
+# def ftrap(x):
+#     # common ------------------
+#     global e1, e2 # trapco
+#     global tspec, scprob # temp
+#     # -------------------------
+
+#     snmt = 0.
+#     nt = 6
+#     tspec = truspectrum(x, e2, snmt, nt)
+#     scprob = scatprob(e1, x, e2)
+#     return tspec * scprob
+
+# def scatprob(e, ep, e0):
+
+#     # save----------------
+#     global ifl_scatprob
+#     global en, s1, g1
+#     # --------------------
+
+
+#     ifl_scatprob += 1
+#     if ifl_scatprob == 1:
+#         with open("Nscat.dat", "r") as f:
+#             for i in range(221):
+#                 input(en[i], s1[i])
+#             spline = interpolate.interp1d(en, s1, kind='cubic') # spline(221, en, s1, g1, w1, w2, w3)
     
-    pass
-
-
-def ftrap(x):
-    # common ------------------
-    global e1, e2 # trapco
-    global tspec, scprob # temp
-    # -------------------------
-
-    snmt = 0.
-    nt = 6
-    tspec = truspectrum(x, e2, snmt, nt)
-    scprob = scatprob(e1, x, e2)
-    return tspec * scprob
-
-def scatprob(e, ep, e0):
-
-    # save----------------
-    global ifl_scatprob
-    global en, s1, g1
-    # --------------------
-
-
-    ifl_scatprob += 1
-    if ifl_scatprob == 1:
-        with open("Nscat.dat", "r") as f:
-            for i in range(221):
-                input(en[i], s1[i])
-            spline = interpolate.interp1d(en, s1, kind='cubic') # spline(221, en, s1, g1, w1, w2, w3)
-    
-    if ep - e < 0.:
-        prob = .0
-    else:
-        prob = spline(ep-e) # splint(221, ep-e, prob, en, s1, g1) #!!!!!
-    return prob
+#     if ep - e < 0.:
+#         prob = .0
+#     else:
+#         prob = spline(ep-e) # splint(221, ep-e, prob, en, s1, g1) #!!!!!
+#     return prob
 
 def truspectrum(e, e0, snm, ntype):
     # common ----------------------------------
@@ -710,15 +720,17 @@ def transmission(energy):
         shiftold_t = shift
         RFCAL_KATRIN(thick, etrans, trans)
         spline_t = interpolate.interp1d(etrans, trans, kind='cubic')
+    
     if energy <= 0.:
         return 0.
     if energy >= 300.:
         return 1.
+   
     tran = spline_t(energy) # splint(221, energy, tran, etrans, trans, gtrans)
     return tran
 
-def RFCAL_KATRIN(fac, e, rf):
 
+def RFCAL_KATRIN(fac, e, rf):
 
     er = np.zeros(221)
     sProb = np.zeros(6)
@@ -735,6 +747,7 @@ def RFCAL_KATRIN(fac, e, rf):
             ProbCalc_int(sxt, sProb, theta_tmp)
             print(theta_tmp, sProb, file=f)
 
+    s1, s2, s3, s4, s5 = np.zeros(5) # dummy string
     s1, s2, s3, s4, s5 = LOSPAT(er, 0., s1, s2, s3, s4, s5)
 
     for i in range(221):
@@ -747,7 +760,7 @@ def RFCAL_KATRIN(fac, e, rf):
         e1 = 0.
         e0 = er[i]
         errel = 1.e-3
-        val = integrate.quad(clr, e1, e0, epsabs=erabs, epsrel=errel)
+        val, err = integrate.quad(clr, e1, e0, epsabs=erabs, epsrel=errel)
         Spres_point = spres(er[i])
         ProbCalc_int(sxt,sProb,theta_max)
         rf[i]=Spres_point*sProb[0]+val
@@ -855,6 +868,7 @@ def clr(x):
     ep = np.zeros(221)
     Spres_point = spres(E0 - x)
     ProbCalc_int(sxt, sProb, theta_max)
+    s1, s2, s3, s4, s5 = np.zeros(5) # dummy string
     s1, s2, s3, s4, s5 = LOSPAT(ep,x,s1,s2,s3,s4,s5)
     POG = sProb[0]*s1 + sProb[1]*s2 + sProb[2]*s3 + sProb[3]*s4 + sProb[4]*s5
     return POG * spres(E0 -x)
@@ -882,21 +896,22 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
 
     # global e, s1, s2, s3, s4, s5
     global ifl_ls
+    global spline1_ls, spline2_ls, spline3_ls, spline4_ls, spline4_ls, spline5_ls
 
     if ifl_ls == 0:
         ifl_ls += 1
 
         for i in range(21):
-            e[i] = (i-1)/20.0
+            e[i] = i/20.0
         
         for i in range(21, 190+1):
-            e[i] = .2*(i-20)+1
+            e[i] = 0.195*(i-21) + 2.0
 
         for i in range(191, 211+1):
-            e[i] = 3. *(i-190) + 35
+            e[i] = 3.15*(i-191) + 35.0
 
         for i in range(212, 220+1):
-            e[i] = 20.*(i-211) + 100
+            e[i] = 25.*(i-212) + 100.0
         
 
 
@@ -914,7 +929,7 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
             else:
                 s1[i] = a2 * w_2**2/(w_2**2 + 4.*(de-xc2)**2)
         
-        spline1 = interpolate.interp1d(e, s1, kind='cubic')
+        spline1_ls = interpolate.interp1d(e, s1, kind='cubic')
 
         ifail = 0
         
@@ -925,46 +940,46 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
             erabs = 1.e-10
             errel = 1.e-4
             Emin = 0.
-            C11 = lambda x: spline1(x) * spline1(Emax - x)
+            C11 = lambda x: spline1_ls(x) * spline1_ls(Emax - x)
             s2[i], err = integrate.quad(C11, Emin, Emax, epsabs = erabs, epsrel=errel)
         
-        spline2 = interpolate.interp1d(e, s2, kind='cubic')
+        spline2_ls = interpolate.interp1d(e, s2, kind='cubic')
 
         # 3-scatterings
         s3[0] = 0.
         for i in range(1, 220+1):
             Emax = e[i]
-            C12 = lambda x: spline1(x) * spline2(Emax - x)
+            C12 = lambda x: spline1_ls(x) * spline2_ls(Emax - x)
             s3[i], err = integrate.quad(C12, Emin, Emax, epsabs=erabs, epsrel=errel)
         
-        spline3 = interpolate.interp1d(e, s3, kind='cubic')
+        spline3_ls = interpolate.interp1d(e, s3, kind='cubic')
 
         # 4-scatterings
         s4[i] = 0.
         for i in range(1, 220+1):
             Emax = e[i]
-            C13 = lambda x: spline1(x) * spline3(Emax - x)
+            C13 = lambda x: spline1_ls(x) * spline3_ls(Emax - x)
             s4[i], err = integrate.quad(C13, Emin, Emax, epsabs=erabs, epsrel=errel)
 
-        spline4 = interpolate.interp1d(e, s4, kind='cubic')
+        spline4_ls = interpolate.interp1d(e, s4, kind='cubic')
 
         # 5-scatterings
         s5[i] = 0.
         for i in range(1, 220+1):
             Emax = e[i]
-            C14 = lambda x: spline1(x) * spline4(Emax - x)
+            C14 = lambda x: spline1_ls(x) * spline4_ls(Emax - x)
             s5[i], err = integrate.quad(C14, Emin, Emax, epsabs=erabs, epsrel=errel)
 
-        spline5 = interpolate.interp1d(e, s5, kind='cubic')
+        spline5_ls = interpolate.interp1d(e, s5, kind='cubic')
 
         for i in range(221):
             ep[i] = e[i]
 
-    s1p = spline1(e_point)
-    s2p = spline2(e_point)
-    s3p = spline3(e_point)
-    s4p = spline4(e_point)
-    s5p = spline5(e_point)
+    s1p = spline1_ls(e_point)
+    s2p = spline2_ls(e_point)
+    s3p = spline3_ls(e_point)
+    s4p = spline4_ls(e_point)
+    s5p = spline5_ls(e_point)
 
     return s1p, s2p, s3p, s4p, s5p
 
