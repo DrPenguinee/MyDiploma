@@ -31,8 +31,7 @@ m.fixed = True
 m.fixed[1] = False
 m.limits[2] = (-0.39e1, 0.39e1)
 
-m.migrad()
-print(m.values)
+# m.migrad()
+# print(m.values)
 
-# print(chi2(values))
-# print(values)
+print(chi2(values))

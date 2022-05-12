@@ -114,7 +114,11 @@ etrans, trans = np.zeros(221), np.zeros(221)
 
 # LOSPAT--------------------------------------------
 ifl_ls = 0
-spline1_ls, spline2_ls, spline3_ls, spline4_ls, spline5_ls = np.zeros(5)
+spline1_ls = lambda x: 1
+spline2_ls = lambda x: 1
+spline3_ls = lambda x: 1
+spline4_ls = lambda x: 1
+spline5_ls = lambda x: 1
 
 #------------------------------------------------
 
@@ -159,7 +163,7 @@ def chi2(xval):
     snm2 = xval[14]**2                  # snm2 - squared heavy neutrino mass
     hnupr = xval[15]                    # hnupr - heavy neutrino probability
     unvis = xval[16]                    # unvis - unvisible correction shift
-    cut = xval[17]                      # cut - point "glitches" cut
+    cut = xval[17]                      # cut - point "glitches" 
     pos_ml = e0 - xval[18]              # pos_ml - missing level energy
     prob_ml = xval[19]                  # prob_ml - missing level probability
     acc = .0002
@@ -187,12 +191,13 @@ def chi2(xval):
 
         
         # Arrays calculation
+        print('Arrays calculation')
         for i in range(1, 101):
             entr = float(i)
-            tran = transmission(entr) # need transmission -> rfcal -> lospat
+            tran = transmission(entr)
             # fstail(e0 - entr - 165., e0, tail)
             # vesp, vespnm = specint(e0 - entr, e0, snm, thick)
-            print(i, tran)
+            print('{:3d} {:.6f}'.format(i, tran))
         print('')
         # Arrays calculated
 
@@ -250,7 +255,7 @@ def chi2(xval):
         if ntype == 2:
             expspectrum(e, espec[i], e0, snm, acc) # need transmission
             expspectrum(e, hnu[i], e0, snm2, acc)
-        # eml[i] = specmlint(e, pos_ml, e0)
+        eml[i] = specmlint(e, pos_ml, e0)
         backval[i] = background(e, e0, back, backpar)
         # endef[i] = endeffect(e, eend, step) # need transmission
         # if
@@ -322,7 +327,7 @@ def specmlint(e, e0, emax):
         print("Spline is calculated for missing level")
         with open('spn_MCm1.dat', 'w') as f:
             for i in range(301):
-                print(de_sl[i], slev1_sl[i], cm1_sl[i])
+                print("{:5.2f} {:.2f} {:.2f}".format(de_sl[i], slev1_sl[i], cm1_sl[i]), file=f)
         
     if e0 - e < 0:
         eml = .0
@@ -392,8 +397,9 @@ def specint(e, e0, snm, thick):
         # read exitation level data
         with open('excitat2.dat', 'r') as f:
             ist = 0
-            reader = csv.reader(f, delimiter=' ')
-            for row in reader:
+            reader = f.readlines()
+            for item in reader:
+                row = list(map(float, item.split() ) )
                 prolev1[ist] = row[0]
                 prolev[ist] = prolev1[ist] 
                 elev1[ist] = row[1]
@@ -731,6 +737,9 @@ def transmission(energy):
 
 
 def RFCAL_KATRIN(fac, e, rf):
+    global sxt, E0
+    global theta_max
+    global spline_t
 
     er = np.zeros(221)
     sProb = np.zeros(6)
@@ -747,15 +756,14 @@ def RFCAL_KATRIN(fac, e, rf):
             ProbCalc_int(sxt, sProb, theta_tmp)
             print(theta_tmp, sProb, file=f)
 
-    s1, s2, s3, s4, s5 = np.zeros(5) # dummy string
-    s1, s2, s3, s4, s5 = LOSPAT(er, 0., s1, s2, s3, s4, s5)
+    LOSPAT(er, 0.)
 
     for i in range(221):
         e[i] = er[i]
 
     erabs = 1.e-5
     rf[0] = 0.
-    for i in range(221):
+    for i in range(1, 221):
         ifail = 0
         e1 = 0.
         e0 = er[i]
@@ -765,10 +773,10 @@ def RFCAL_KATRIN(fac, e, rf):
         ProbCalc_int(sxt,sProb,theta_max)
         rf[i]=Spres_point*sProb[0]+val
      
-    spline = interpolate.interp1d(er,rf, kind='cubic')
-    with open('rf.dat', 'w'):
+    spline_t = interpolate.interp1d(er,rf, kind='cubic')
+    with open('rf.dat', 'w') as f:
         for i in range(221):
-            print(er[i], rf[i])
+            print('{:7.5f} {:.3f}'.format(er[i], rf[i]), file=f)
     
     return
 
@@ -792,34 +800,34 @@ def ProbCalc_int(x,sp,theta_max):
             cos_th = 1 - (39-i)/100 + .005
             theta[i] = 1 - (39-i)/100
             sx = x/cos_th
-            spr = 0 # dummy string
-            spr = ProbCalc(sx, 0, spr)
+            # spr = 0 # dummy string
+            spr = ProbCalc(sx, 0)
             P0[i] = P0[i+1] + spr
-            spr = ProbCalc(sx, 1, spr)
+            spr = ProbCalc(sx, 1)
             P1[i] = P1[i+1] + spr
-            spr = ProbCalc(sx, 2, spr)
+            spr = ProbCalc(sx, 2)
             P2[i] = P2[i+1] + spr
-            spr = ProbCalc(sx, 3, spr)
+            spr = ProbCalc(sx, 3)
             P3[i] = P3[i+1] + spr
-            spr = ProbCalc(sx, 4, spr)
+            spr = ProbCalc(sx, 4)
             P4[i] = P4[i+1] + spr
-            spr = ProbCalc(sx, 5, spr)
+            spr = ProbCalc(sx, 5)
             P5[i] = P5[i+1] + spr
         
         theta[39] = 1.
         sx = x/theta[39]
 
-        spr = ProbCalc(sx, 0, spr)
+        spr = ProbCalc(sx, 0)
         P0[39] = spr
-        spr = ProbCalc(sx, 1, spr)
+        spr = ProbCalc(sx, 1)
         P1[39] = spr
-        spr = ProbCalc(sx, 2, spr)
+        spr = ProbCalc(sx, 2)
         P2[39] = spr
-        spr = ProbCalc(sx, 3, spr)
+        spr = ProbCalc(sx, 3)
         P3[39] = spr
-        spr = ProbCalc(sx, 4, spr)
+        spr = ProbCalc(sx, 4)
         P4[39] = spr
-        spr = ProbCalc(sx, 5, spr)
+        spr = ProbCalc(sx, 5)
         P5[39] = spr
 
         for i in range(40-1):
@@ -850,7 +858,7 @@ def ProbCalc_int(x,sp,theta_max):
 
 
 
-def ProbCalc(x,n,sp):
+def ProbCalc(x,n):
     spr, pr = np.zeros(6), np.zeros(6)
     pr[0] = np.exp(-x)
     spr[0] = (1. - pr[0])/x
@@ -859,22 +867,24 @@ def ProbCalc(x,n,sp):
         pr[i] = pr[i-1]*x/i
         spr[i] = spr[i-1] - pr[i-1]/i
     
-    sp = spr[n-1]
+    sp = spr[n]
     return sp
 
 def clr(x):
     global E0, sxt
+
     sProb = np.zeros(6)
     ep = np.zeros(221)
+
     Spres_point = spres(E0 - x)
     ProbCalc_int(sxt, sProb, theta_max)
-    s1, s2, s3, s4, s5 = np.zeros(5) # dummy string
-    s1, s2, s3, s4, s5 = LOSPAT(ep,x,s1,s2,s3,s4,s5)
-    POG = sProb[0]*s1 + sProb[1]*s2 + sProb[2]*s3 + sProb[3]*s4 + sProb[4]*s5
-    return POG * spres(E0 -x)
+    s1, s2, s3, s4, s5 = LOSPAT(ep,x)
+    POG = sProb[1]*s1 + sProb[2]*s2 + sProb[4]*s3 + sProb[4]*s4 + sProb[5]*s5
+    return POG * spres(E0 - x)
 
 def spres(E):
     global theta_max
+    global shift, shift2 
 
     dE = 0.93
     Bs = 6.
@@ -892,9 +902,9 @@ def spres(E):
     return spres
 
 
-def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
+def LOSPAT(ep, e_point):
 
-    # global e, s1, s2, s3, s4, s5
+    global e, s1, s2, s3, s4, s5
     global ifl_ls
     global spline1_ls, spline2_ls, spline3_ls, spline4_ls, spline4_ls, spline5_ls
 
@@ -902,16 +912,16 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
         ifl_ls += 1
 
         for i in range(21):
-            e[i] = i/20.0
+            e[i] = i/20.0 # 0-1.0
         
-        for i in range(21, 190+1):
-            e[i] = 0.195*(i-21) + 2.0
+        for i in range(21, 191):
+            e[i] = 0.195*(i-21) + 2.0 # 2.0 - 35.0
 
-        for i in range(191, 211+1):
-            e[i] = 3.15*(i-191) + 35.0
+        for i in range(191, 212):
+            e[i] = 3.15*(i-191) + 35.0 # 35. - 98.
 
-        for i in range(212, 220+1):
-            e[i] = 25.*(i-212) + 100.0
+        for i in range(212, 221):
+            e[i] = 25.*(i-212) + 100.0 # 100 - 300
         
 
 
@@ -935,7 +945,7 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
         
         # 2-scatterings
         s2[0] = 0.
-        for i in range(1, 220+1):
+        for i in range(1, 221):
             Emax = e[i]
             erabs = 1.e-10
             errel = 1.e-4
@@ -947,7 +957,7 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
 
         # 3-scatterings
         s3[0] = 0.
-        for i in range(1, 220+1):
+        for i in range(1, 221):
             Emax = e[i]
             C12 = lambda x: spline1_ls(x) * spline2_ls(Emax - x)
             s3[i], err = integrate.quad(C12, Emin, Emax, epsabs=erabs, epsrel=errel)
@@ -956,7 +966,7 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
 
         # 4-scatterings
         s4[i] = 0.
-        for i in range(1, 220+1):
+        for i in range(1, 221):
             Emax = e[i]
             C13 = lambda x: spline1_ls(x) * spline3_ls(Emax - x)
             s4[i], err = integrate.quad(C13, Emin, Emax, epsabs=erabs, epsrel=errel)
@@ -965,7 +975,7 @@ def LOSPAT(ep, e_point, s1p, s2p, s3p, s4p, s5p):
 
         # 5-scatterings
         s5[i] = 0.
-        for i in range(1, 220+1):
+        for i in range(1, 221):
             Emax = e[i]
             C14 = lambda x: spline1_ls(x) * spline4_ls(Emax - x)
             s5[i], err = integrate.quad(C14, Emin, Emax, epsabs=erabs, epsrel=errel)

@@ -1,0 +1,7 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{\numberline {1}Введение}{3}{}%
+\contentsline {section}{\numberline {2}Обзор задачи}{6}{}%
+\contentsline {section}{\numberline {3}Основная часть}{6}{}%
+\contentsline {section}{\numberline {4}Выводы}{6}{}%
+\contentsline {section}{\numberline {5}Заключение}{6}{}%
+\contentsline {section}{\numberline {6}Список литературы}{6}{}%
