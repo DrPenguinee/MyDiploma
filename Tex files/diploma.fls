@@ -1,4 +1,4 @@
-PWD /home/kirill/Desktop/Diploma/Tex files
+PWD /home/kirill/Desktop/MyDiploma/Tex files
 INPUT /usr/share/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
 INPUT diploma.tex
@@ -539,8 +539,10 @@ INPUT diploma.aux
 INPUT diploma.run.xml
 OUTPUT diploma.run.xml
 INPUT /usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t2a.enc
+INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb
+INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb
 INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
 INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb
 INPUT /usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb

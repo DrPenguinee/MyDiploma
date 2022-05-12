@@ -1,7 +1,5 @@
 \documentclass[a4paper,14pt]{extarticle}
 
-%\bibliographystyle{plain}
-
 % Russian-specific packeges
 %--------------------------------
 \usepackage[T2A]{fontenc}
@@ -165,15 +163,16 @@
 
     %===========================================================================================
     \newpage
-    \section{Литературный обзор}
-        
+    \section{Обзор задачи}
+    
+    \newpage
     \section{Основная часть}
     
     \section{Выводы}
     
     \section{Заключение}
     
-    
+    \newpage
     \newrefcontext[sorting=none]
     \printbibliography[heading=bibnumbered]
 
