@@ -1,6 +1,6 @@
 import numpy as np
 from iminuit import Minuit
-from Diploma import chi2
+import MonteCarlo as MC
 
 values = np.zeros(20)
 
@@ -25,13 +25,17 @@ values[17] = 10000.        # cut
 values[18] = 0             # pos_ml
 values[19] = 0             # prob_ml
 
-m = Minuit(chi2, tuple(values))
+m = Minuit(MC.chi2, tuple(values))
 m.errordef = Minuit.LEAST_SQUARES
 m.fixed = True
-m.fixed[1] = False
-m.limits[2] = (-0.39e1, 0.39e1)
+m.fixed[2] = False
+m.limits[2] = (-3.95, 20)
 
-# m.migrad()
-# print(m.values)
+with open('mnu2.dat', 'w') as f:
+    for i in range(10**5):
+        MC.mc_flag = 1
+        m.migrad()
+        print('{:6d} {:f}'.format(i+1, m.values[2]), file=f)
 
-print(chi2(values))
+print(m.values)
+

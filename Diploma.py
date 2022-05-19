@@ -1,4 +1,3 @@
-import csv
 import numpy as np
 from scipy import interpolate
 from scipy import integrate
@@ -82,10 +81,10 @@ e0old = .0
 shiftold = 100.
 shift2old = 100.
 elev1, prolev1 = np.zeros(193), np.zeros(193)
-de, enode, epoint = np.zeros(98), np.zeros(98), np.zeros(301)
-slev1, cm1 = np.zeros(98), np.zeros(98)
+de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
+slev1 = np.zeros(151)
 vsnm = np.zeros(110)
-vneut1 = np.zeros(98*110).reshape((98, 110))
+vneut1 = np.zeros(151*110).reshape((151, 110))
 # cm201 = np.zeros(151*110).reshape((151, 110))
 # cm221 = np.zeros(151*110).reshape((151, 110))
 # cm021 = np.zeros(151*110).reshape((151, 110))
@@ -257,16 +256,17 @@ def chi2(xval):
             expspectrum(e, hnu[i], e0, snm2, acc)
         eml[i] = specmlint(e, pos_ml, e0)
         backval[i] = background(e, e0, back, backpar)
-        # endef[i] = endeffect(e, eend, step) # need transmission
+        endef[i] = endeffect(e, eend, step) # need transmission
         # if
         if e < emin - .01 or e > emax:
             continue
         sespec += espec[i] + hnu[i]*hnupr
         sml += eml[i]*prob_ml
         sbackval += backval[i]
-        # sendef += endef[i]
-    print("s = %f, sbackval = %f, sespec = %f" % (s, sbackval, sespec))
+        sendef += endef[i]
+    print("s = %f, sbackval = %f, sespec = %f, sendef = %f" % (s, sbackval, sespec, sendef))
     w = (s - sbackval)/sespec
+    out = open('output.dat', 'w')
     for i in range(npoint):
         e = epoint[i]
         theor = w * (espec[i] + hnu[i]*hnupr + trspec[i]*backpar + eml[i]*prob_ml) \
@@ -284,13 +284,14 @@ def chi2(xval):
                     i, e-18000.0, exper, w * (espec[i]-espnm[i]+hnupr*(hnu[i]-espnm2[i])) - backval[i],
                     endef[i], w * espnm[i], w * espnm2[i] *hnupr, w * eml[i] * prob_ml
                 )
-
+        print("{:3d} {:f} {:f}".format(i, e, theor), file=out)
         if e < (emin - 0.01) or e > emax:
             continue
         dif = (exper - theor)/error[i]
         if abs(dif) > cut:
             continue
         fval += dif ** 2
+    out.close()
     return fval
 
     
@@ -388,9 +389,7 @@ def specint(e, e0, snm, thick):
     # cm221 = np.zeros(151*110).reshape((151, 110))
     # cm021 = np.zeros(151*110).reshape((151, 110))
 
-    name = ["vneut1_sample.dat"]
-
-
+    name = ['spline1-Mainz.dat', 'spline2-Mainz.dat', 'spline2-KATRIN.dat', 'spline2-Troitsk.dat', 'net.dat']
 
 
     if ifl_specint == 0:
@@ -433,26 +432,30 @@ def specint(e, e0, snm, thick):
         shift2old = shift2
         # calculation of new splines
         print("Needs a spline")
-        index = 0
-        f = open(name[index], "r")
-        item = list(map(float, f.readline().split() ) )
-        e0file, thickfile, shiftfile, shift2file = item[0], item[1], item[2], item[3]
+        f = open(name[0], "r")
+        # item = list(map(float, f.readline().split() ) )
+        e0file, thickfile, shiftfile, shift2file = e0, thick, shift, shift2
         if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and 
-        abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001):
+        abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001) or True:
             print("Reading file          = %s with paramters" % (name[0]))
-            print("Spectrum endpoint     = %f" % (e0file))
-            print("Thickness factor      = %f" % (thickfile))
-            print("Ex/ion shift, %%       = %f" % (shiftfile))
-            print("First state shift, %%  = %f" % (shift2file))
-            for j in range(98):
-                item = f.readline().split()
-            for j in range(98):
+            # print("Spectrum endpoint     = %f" % (e0file))
+            # print("Thickness factor      = %f" % (thickfile))
+            # print("Ex/ion shift, %%       = %f" % (shiftfile))
+            # print("First state shift, %%  = %f" % (shift2file))
+            for j in range(151):
                 item = list(map(float, f.readline().split() ) )
-                de[j], slev1[j] = item[0], item[1]
+                de[j], slev1[j] = item[1], item[2]
+            f.close()
+
+            f = open(name[-1], "r")
+            f.readline()
             for j in range(110):
                 item = list(map(float, f.readline().split() ) )
                 vsnm[j] = item[1]
-            for j in range(98):
+            f.close()
+
+            f = open(name[1])
+            for j in range(151):
                 for k in range(110):
                     item = list(map(float, f.readline().split() ) )
                     vneut1[j][k] = item[2]
