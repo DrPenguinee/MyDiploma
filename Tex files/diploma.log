@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.5.13)  18 MAY 2022 23:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.5.19)  19 MAY 2022 15:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -826,41 +826,41 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: diploma_pictures/spectrometer.png Graphic file (type png)
 <use diploma_pictures/spectrometer.png>
 Package pdftex.def Info: diploma_pictures/spectrometer.png  used on input line 
-185.
+194.
 (pdftex.def)             Requested size: 281.68515pt x 260.50731pt.
- [6] [7 <./diploma_pictures/spectrometer.png>]
-Overfull \hbox (4.43866pt too wide) in paragraph at lines 225--232
-\T2A/cmr/m/n/14.4 зван-ные рас-се-я-ни-ем, опи-сы-ва-ют-ся как про-из-ве-де-ние
- ве-ро-ят-но-сти s-кратного
- []
-
-
-Overfull \hbox (15.69087pt too wide) in paragraph at lines 244--246
+ [6] [7 <./diploma_pictures/spectrometer.png>] [8]
+Overfull \hbox (15.69087pt too wide) in paragraph at lines 293--295
 []\T2A/cmr/m/n/14.4 Он опре-де-ля-ет-ся маг-нит-ным по-лем в на-чаль-ной по-зи-
 ции элек-тро-на $\OML/cmm/m/it/14.4 B[]$\T2A/cmr/m/n/14.4 ,
  []
 
-[8] [9]
+[9] [10]
 LaTeX Font Info:    Trying to load font information for T2A+cmtt on input line 
-264.
+313.
  (/usr/share/texmf-dist/tex/latex/cyrillic/t2acmtt.fd
 File: t2acmtt.fd 2001/08/11 v1.0a Computer Modern Cyrillic font definitions
 )
-Overfull \hbox (19.01416pt too wide) in paragraph at lines 264--264
+Overfull \hbox (19.01416pt too wide) in paragraph at lines 313--313
 []\T2A/cmr/m/n/14.4 M. Aker et al. \T2A/cmr/m/it/14.4 First direct neutrino-mas
 s measurement with sub-eV sensitivity\T2A/cmr/m/n/14.4 .
  []
 
-[10] (./diploma.aux)
+
+Overfull \hbox (14.1711pt too wide) in paragraph at lines 313--313
+\T2A/cmr/m/n/14.4 properties of a superconducting field photoelectron spectrome
+terї. В: \T2A/cmr/m/it/14.4 Journal
+ []
+
+[11] (./diploma.aux)
 Package logreq Info: Writing requests to 'diploma.run.xml'.
 \openout1 = `diploma.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 15719 strings out of 478238
- 281820 string characters out of 5850456
- 1003939 words of memory out of 5000000
- 33788 multiletter control sequences out of 15000+600000
+ 15731 strings out of 478238
+ 282231 string characters out of 5850456
+ 1007073 words of memory out of 5000000
+ 33800 multiletter control sequences out of 15000+600000
  484186 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  67i,16n,77p,740b,1736s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -871,17 +871,18 @@ c/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/
 cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
 /share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-di
 st/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super
-/sfbx1200.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb><
-/usr/share/texmf-dist/fonts/type1/public/cm-super/sfbx1728.pfb></usr/share/texm
-f-dist/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf-dist/fonts/ty
-pe1/public/cm-super/sfrm1200.pfb></usr/share/texmf-dist/fonts/type1/public/cm-s
-uper/sfrm1440.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfti1440.p
-fb></usr/share/texmf-dist/fonts/type1/public/cm-super/sftt1440.pfb>
-Output written on diploma.pdf (10 pages, 322403 bytes).
+ublic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb><
+/usr/share/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texm
+f-dist/fonts/type1/public/cm-super/sfbx1728.pfb></usr/share/texmf-dist/fonts/ty
+pe1/public/cm-super/sfbx2074.pfb></usr/share/texmf-dist/fonts/type1/public/cm-s
+uper/sfrm1200.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1440.p
+fb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfti1440.pfb></usr/share/
+texmf-dist/fonts/type1/public/cm-super/sftt1440.pfb>
+Output written on diploma.pdf (11 pages, 340067 bytes).
 PDF statistics:
- 121 PDF objects out of 1000 (max. 8388607)
- 74 compressed objects within 1 object stream
+ 129 PDF objects out of 1000 (max. 8388607)
+ 79 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,19 +1,19 @@
 [0] Config.pm:307> INFO - This is Biber 2.17
 [0] Config.pm:310> INFO - Logfile is 'diploma.blg'
-[87] biber:340> INFO - === Wed May 18, 2022, 23:02:30
-[102] Biber.pm:418> INFO - Reading 'diploma.bcf'
-[178] Biber.pm:972> INFO - Found 5 citekeys in bib section 0
-[203] Biber.pm:4383> INFO - Processing section 0
-[215] Biber.pm:4574> INFO - Looking for bibtex file 'ref.bib' for section 0
-[216] bibtex.pm:1713> INFO - LaTeX decoding ...
-[226] bibtex.pm:1518> INFO - Found BibTeX data source 'ref.bib'
-[290] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[290] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'variable = shifted' with 'variable = non-ignorable'
-[290] Biber.pm:4203> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'ru-RU'
-[290] Biber.pm:4209> INFO - No sort tailoring available for locale 'ru-RU'
-[305] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[305] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'variable = shifted' with 'variable = non-ignorable'
-[305] Biber.pm:4203> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'ru-RU'
-[305] Biber.pm:4209> INFO - No sort tailoring available for locale 'ru-RU'
-[311] bbl.pm:654> INFO - Writing 'diploma.bbl' with encoding 'UTF-8'
-[315] bbl.pm:757> INFO - Output to diploma.bbl
+[128] biber:340> INFO - === Thu May 19, 2022, 15:33:31
+[146] Biber.pm:418> INFO - Reading 'diploma.bcf'
+[232] Biber.pm:972> INFO - Found 7 citekeys in bib section 0
+[254] Biber.pm:4383> INFO - Processing section 0
+[268] Biber.pm:4574> INFO - Looking for bibtex file 'ref.bib' for section 0
+[269] bibtex.pm:1713> INFO - LaTeX decoding ...
+[279] bibtex.pm:1518> INFO - Found BibTeX data source 'ref.bib'
+[365] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'variable = shifted' with 'variable = non-ignorable'
+[366] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[366] Biber.pm:4203> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'ru-RU'
+[366] Biber.pm:4209> INFO - No sort tailoring available for locale 'ru-RU'
+[383] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'variable = shifted' with 'variable = non-ignorable'
+[383] UCollate.pm:68> INFO - Overriding locale 'ru-RU' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[383] Biber.pm:4203> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'ru-RU'
+[383] Biber.pm:4209> INFO - No sort tailoring available for locale 'ru-RU'
+[391] bbl.pm:654> INFO - Writing 'diploma.bbl' with encoding 'UTF-8'
+[399] bbl.pm:757> INFO - Output to diploma.bbl

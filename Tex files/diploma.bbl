@@ -165,6 +165,71 @@
       \verb 2105.08533
       \endverb
     \endentry
+    \entry{Beamson_1980}{article}{}
+      \name{author}{3}{}{%
+        {{hash=55648bee6278c133a3a9432e019bac1f}{%
+           family={Beamson},
+           familyi={B\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+        {{hash=b87bacf5503ec9109634179c6fb46f0e}{%
+           family={Porter},
+           familyi={P\bibinitperiod},
+           given={H.Q.},
+           giveni={H\bibinitperiod}}}%
+        {{hash=0eb286e96d76da1cc0227f518359a51f}{%
+           family={Turner},
+           familyi={T\bibinitperiod},
+           given={D.W.},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {{IOP} Publishing}%
+      }
+      \strng{namehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{fullhash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{bibnamehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{authorbibnamehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{authornamehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{authorfullhash}{c0f87fc08c994d14b4264457b8910474}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{An analysis is given of the possible advantages of a photoelectron spectrometer based upon the properties of the axially symmetric inhomogeneous magnetic field of a superconducting solenoid. The consequences of electron motion along the solenoid axis are discussed and it is shown that this can lead to a novel high-resolution method of electron energy analysis together with the possibility of photoelectron microscopy.}
+      \field{journaltitle}{Journal of Physics E: Scientific Instruments}
+      \field{number}{1}
+      \field{title}{The collimating and magnifying properties of a superconducting field photoelectron spectrometer}
+      \field{volume}{13}
+      \field{year}{1980}
+      \field{pages}{64\bibrangedash 66}
+      \range{pages}{3}
+    \endentry
+    \entry{design_report}{article}{}
+      \name{author}{1}{}{%
+        {{hash=076ceab309de0f8a1ffe10fa28637a6f}{%
+           family={al},
+           familyi={a\bibinitperiod},
+           given={J.\bibnamedelimi Angrik},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+           prefix={et},
+           prefixi={e\bibinitperiod}}}%
+      }
+      \strng{namehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{fullhash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{bibnamehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{authorbibnamehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{authornamehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{authorfullhash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \field{extraname}{3}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{FZKA scientic report, vol. 7090}
+      \field{title}{KATRIN Design Report 2004}
+      \field{year}{2005}
+    \endentry
   \enddatalist
   \datalist[entry]{nty/global//global/global}
     \entry{picard}{article}{}
@@ -195,6 +260,31 @@
       \field{pages}{345}
       \range{pages}{1}
     \endentry
+    \entry{design_report}{article}{}
+      \name{author}{1}{}{%
+        {{hash=076ceab309de0f8a1ffe10fa28637a6f}{%
+           family={al},
+           familyi={a\bibinitperiod},
+           given={J.\bibnamedelimi Angrik},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+           prefix={et},
+           prefixi={e\bibinitperiod}}}%
+      }
+      \strng{namehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{fullhash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{bibnamehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{authorbibnamehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{authornamehash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \strng{authorfullhash}{076ceab309de0f8a1ffe10fa28637a6f}
+      \field{extraname}{2}
+      \field{sortinit}{a}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{FZKA scientic report, vol. 7090}
+      \field{title}{KATRIN Design Report 2004}
+      \field{year}{2005}
+    \endentry
     \entry{aker}{misc}{}
       \name{author}{1}{}{%
         {{hash=684e6ae284312c9b31c54d57b6c30494}{%
@@ -211,7 +301,7 @@
       \strng{authorbibnamehash}{684e6ae284312c9b31c54d57b6c30494}
       \strng{authornamehash}{684e6ae284312c9b31c54d57b6c30494}
       \strng{authorfullhash}{684e6ae284312c9b31c54d57b6c30494}
-      \field{extraname}{2}
+      \field{extraname}{3}
       \field{sortinit}{a}
       \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
       \field{labelnamesource}{author}
@@ -222,6 +312,46 @@
       \verb{eprint}
       \verb 2105.08533
       \endverb
+    \endentry
+    \entry{Beamson_1980}{article}{}
+      \name{author}{3}{}{%
+        {{hash=55648bee6278c133a3a9432e019bac1f}{%
+           family={Beamson},
+           familyi={B\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+        {{hash=b87bacf5503ec9109634179c6fb46f0e}{%
+           family={Porter},
+           familyi={P\bibinitperiod},
+           given={H.Q.},
+           giveni={H\bibinitperiod}}}%
+        {{hash=0eb286e96d76da1cc0227f518359a51f}{%
+           family={Turner},
+           familyi={T\bibinitperiod},
+           given={D.W.},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {{IOP} Publishing}%
+      }
+      \strng{namehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{fullhash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{bibnamehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{authorbibnamehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{authornamehash}{c0f87fc08c994d14b4264457b8910474}
+      \strng{authorfullhash}{c0f87fc08c994d14b4264457b8910474}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{An analysis is given of the possible advantages of a photoelectron spectrometer based upon the properties of the axially symmetric inhomogeneous magnetic field of a superconducting solenoid. The consequences of electron motion along the solenoid axis are discussed and it is shown that this can lead to a novel high-resolution method of electron energy analysis together with the possibility of photoelectron microscopy.}
+      \field{journaltitle}{Journal of Physics E: Scientific Instruments}
+      \field{number}{1}
+      \field{title}{The collimating and magnifying properties of a superconducting field photoelectron spectrometer}
+      \field{volume}{13}
+      \field{year}{1980}
+      \field{pages}{64\bibrangedash 66}
+      \range{pages}{3}
     \endentry
     \entry{https://doi.org/10.48550/arxiv.1306.4669}{misc}{}
       \name{author}{3}{}{%

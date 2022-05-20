@@ -2,8 +2,8 @@
 \contentsline {section}{\numberline {1}Введение}{3}{}%
 \contentsline {section}{\numberline {2}Обзор задачи}{6}{}%
 \contentsline {subsection}{\numberline {2.1}Устройство спектрометра}{6}{}%
-\contentsline {subsection}{\numberline {2.2}Расчет спектра}{6}{}%
-\contentsline {section}{\numberline {3}Основная часть}{9}{}%
-\contentsline {section}{\numberline {4}Выводы}{9}{}%
-\contentsline {section}{\numberline {5}Заключение}{9}{}%
-\contentsline {section}{\numberline {6}Список литературы}{10}{}%
+\contentsline {subsection}{\numberline {2.2}Расчет спектра}{8}{}%
+\contentsline {section}{\numberline {3}Основная часть}{10}{}%
+\contentsline {section}{\numberline {4}Выводы}{10}{}%
+\contentsline {section}{\numberline {5}Заключение}{10}{}%
+\contentsline {section}{\numberline {6}Список литературы}{11}{}%

@@ -1,3 +1,52 @@
+@article{minkowski,
+    author = "P. Minkowski",
+    title = "$\mu \rightarrow e\gamma$ at a Rate of One Out of $10^9$ Muon Decays?",
+    journal = "Phys. Lett.",
+    volume = "B67",
+    year = "1977",
+    pages = "421"
+}
+
+@misc{https://doi.org/10.48550/arxiv.1306.4669,
+  %doi = {10.48550/ARXIV.1306.4669},
+  %url = {https://arxiv.org/abs/1306.4669},
+  
+  author = {Gell-Mann, Murray and Ramond, Pierre and Slansky, Richard},  
+  title = {Complex Spinors and Unified Theories},
+  eprint = {2105.08533},
+  eprinttype = {arxiv}, 
+  year = {2013}
+  %copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
+
+@misc{aker,
+    author = "M. Aker et al.",
+    title = "First direct neutrino-mass measurement with sub-eV sensitivity",
+    eprint = {2105.08533},
+    eprinttype = {arxiv},
+    year = "2021",
+    %url = {https://arxiv.org/abs/2105.08533}
+}
+
+@article{lobashev,
+    author = "V. Lobashev and P. Spivak",
+    title = "A METHOD FOR MEASURING THE ANTI-ELECTRON-NEUTRINO REST MASS",
+    journal = "Nucl. Instrum. Meth.",
+    volume = "A 240",
+    year = "1985",
+    pages = "305"
+}
+
+@article{picard,
+    author = "A. Picard et al",
+    title = "A solenoid retarding spectrometer with high resolution and transmission for kev electrons",
+    journal = "Nuclear Instruments and Methods in Physics Research Section B: Beam Interactions with Materials and Atoms",
+    volume = "63",
+    year = "1992",
+    pages = "345"
+}
+
 @article{einstein,
     author = "Albert Einstein",
     title = "{Zur Elektrodynamik bewegter K{\"o}rper}. ({German})
@@ -36,3 +85,4 @@
     year = "1973",
     chapter = "1.2",
     keywords  = "knuth,programming"
+}

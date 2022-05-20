@@ -2349,11 +2349,17 @@
     <bcf:citekey order="3">lobashev</bcf:citekey>
     <bcf:citekey order="4">picard</bcf:citekey>
     <bcf:citekey order="5">aker</bcf:citekey>
-    <bcf:citekey order="6">minkowski</bcf:citekey>
-    <bcf:citekey order="7">https://doi.org/10.48550/arxiv.1306.4669</bcf:citekey>
-    <bcf:citekey order="8">lobashev</bcf:citekey>
-    <bcf:citekey order="9">picard</bcf:citekey>
-    <bcf:citekey order="10">aker</bcf:citekey>
+    <bcf:citekey order="6">Beamson_1980</bcf:citekey>
+    <bcf:citekey order="7">lobashev</bcf:citekey>
+    <bcf:citekey order="8">picard</bcf:citekey>
+    <bcf:citekey order="9">design_report</bcf:citekey>
+    <bcf:citekey order="10">minkowski</bcf:citekey>
+    <bcf:citekey order="11">https://doi.org/10.48550/arxiv.1306.4669</bcf:citekey>
+    <bcf:citekey order="12">lobashev</bcf:citekey>
+    <bcf:citekey order="13">picard</bcf:citekey>
+    <bcf:citekey order="14">aker</bcf:citekey>
+    <bcf:citekey order="15">Beamson_1980</bcf:citekey>
+    <bcf:citekey order="16">design_report</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">
