@@ -4,6 +4,8 @@ from scipy import interpolate
 from scipy import integrate
 
 mc_flag = 1
+sigma = 1
+file_index = 2
 
 # COMMON blocks:
 
@@ -84,6 +86,7 @@ thickold = .0
 e0old = .0
 shiftold = 100.
 shift2old = 100.
+file_indexold = 1
 elev1, prolev1 = np.zeros(193), np.zeros(193)
 de, enode, epoint = np.zeros(151), np.zeros(151), np.zeros(301)
 slev1 = np.zeros(151)
@@ -213,7 +216,6 @@ def chi2(xval):
         sendef = 0.
 
         # Faked spectrum formation--------------------------------------
-        w = 5.95742905802354e+01
         with open('run_kat_MC2.dat', 'w') as f:
             print("Simulation with Elow=%f" % (emin), file=f)
             print("%s %s %s %s" % ("HV", "Freq", "Err", "Time"), file=f)
@@ -225,8 +227,8 @@ def chi2(xval):
                 # trapbackground(e, trspec[i], e0)
                 endef[i] = endeffect(e, eend, step)
                 backval[i] = background(e, e0, back, backpar)
-                fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
-                Edata[i] = fakesp[i]
+                # fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
+                # Edata[i] = fakesp[i]
 
                 sespec += espec[i] + hnu[i]*hnupr
                 sml += eml[i]*prob_ml
@@ -234,6 +236,10 @@ def chi2(xval):
                 sendef += endef[i]
 
                 print('{:.1f} {:10f} {:10f}'.format(e, Edata[i], error[i]), file=f)
+            w = (s - sbackval)/sespec
+            for i in range(npoint):
+                fakesp[i] = w * (espec[i] + hnu[i]*hnupr + eml[i]*prob_ml) + backval[i] + endef[i]
+                Edata[i] = fakesp[i]
         # Faked spectrum formed--------------------------------------------
         print('w = {:.14e}'.format((s - sbackval)/sespec))
 
@@ -246,14 +252,14 @@ def chi2(xval):
             f = open('mc.dat', 'a')
         print('ifl = {:d}, Num_MC = {:d}'.format(ifl_chi2, Num_MC), file=f)
         for i in range(npoint):
-            Edata[i] = fakesp[i] + error[i]*np.random.normal()
+            Edata[i] = fakesp[i] + error[i]*np.random.normal(scale=sigma)
             rancor[i] = (Edata[i] - fakesp[i])/error[i]
             print(Edata[i], file=f)
         print('', file=f)
         f.close()
-        for i in range(npoint):
-            print(rancor[i])
-        print(Num_MC)
+        # for i in range(npoint):
+        #     print(rancor[i])
+        # print(Num_MC)
 
     # string 188
     if iflag == 3:
@@ -398,7 +404,7 @@ def specint(e, e0, snm, thick):
     # ------------------------
 
     # save--------------------
-    global ifl_specint, de, thickold, shiftold, shift2old, e0old
+    global ifl_specint, de, thickold, shiftold, shift2old, e0old, file_indexold
     global vsnm, vneut1 # cm201, cm221, cm021
     global elev1, prolev1, enode, slev, cm1
     global spline_sp, spline2_sp
@@ -450,8 +456,9 @@ def specint(e, e0, snm, thick):
     if (abs(thick-thickold)>=0.000001 or 
         abs(shift2-shift2old)>=0.000001 or 
         abs(shift-shiftold)>=0.000001 or
-        abs(e0-e0old)>15.35):
+        abs(e0-e0old)>15.35 or abs(file_index-file_indexold)>0.1):
         
+        file_indexold = file_index
         e0old = e0
         thickold = thick
         shiftold = shift 
@@ -463,7 +470,7 @@ def specint(e, e0, snm, thick):
         e0file, thickfile, shiftfile, shift2file = e0, thick, shift, shift2
         if (abs(thick-thickfile)<=0.0001 and abs(e0-e0file) <= 15.25 and 
         abs(shift2-shift2file)<=.0001 and abs(shift-shiftfile)<=.0001) or True:
-            print("Reading file          = %s with paramters" % (name[0]))
+            print("Reading file          = %s with parameters" % (name[0]))
             # print("Spectrum endpoint     = %f" % (e0file))
             # print("Thickness factor      = %f" % (thickfile))
             # print("Ex/ion shift, %%       = %f" % (shiftfile))
@@ -480,7 +487,8 @@ def specint(e, e0, snm, thick):
                 vsnm[j] = item[1]
             f.close()
 
-            f = open(name[3])
+
+            f = open(name[file_index])
             for j in range(151):
                 for k in range(110):
                     item = list(map(float, f.readline().split() ) )

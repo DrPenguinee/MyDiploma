@@ -1,0 +1,15 @@
+@article{10.2307/2280095,
+ ISSN = {01621459},
+ URL = {http://www.jstor.org/stable/2280095},
+ abstract = {The test is based on the maximum difference between an empirical and a hypothetical cumulative distribution. Percentage points are tabled, and a lower bound to the power function is charted. Confidence limits for a cumulative distribution are described. Examples are given. Indications that the test is superior to the chi-square test are cited.},
+ author = {Frank J. Massey},
+ journal = {Journal of the American Statistical Association},
+ number = {253},
+ pages = {68--78},
+ publisher = {[American Statistical Association, Taylor & Francis, Ltd.]},
+ title = {The Kolmogorov-Smirnov Test for Goodness of Fit},
+ urldate = {2022-05-20},
+ volume = {46},
+ year = {1951}
+}
+

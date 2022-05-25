@@ -31,11 +31,27 @@ m.fixed = True
 m.fixed[2] = False
 m.limits[2] = (-3.95, 20)
 
-with open('mnu2.dat', 'w') as f:
-    for i in range(10**5):
-        MC.mc_flag = 1
-        m.migrad()
-        print('{:6d} {:f}'.format(i+1, m.values[2]), file=f)
+sigmas_t = []
+
+for s in sigmas_t:
+    MC.file_index = 3
+    with open(f"troitsk mnu2 s = {s}.dat", 'w') as g:
+        MC.sigma = s
+        for i in range(10**5):
+            MC.mc_flag = 1
+            m.migrad()
+            print('{:6d} {:f}'.format(i+1, m.values[2]), file=g)
+
+sigmas_k = [0.2, 0.4, 0.8]
+
+# for s in sigmas_k:
+#     MC.file_index = 2
+#     with open(f"katrin mnu2 s = {s}.dat", 'w') as g:
+#         MC.sigma = s
+#         for i in range(10**5):
+#             MC.mc_flag = 1
+#             m.migrad()
+#             print('{:6d} {:f}'.format(i+1, m.values[2]), file=g)
+
 
 print(m.values)
-
